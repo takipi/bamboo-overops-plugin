@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration debug="true">
+    <property name="overops-admin" value="overops-admin.log"/>
+
+    <appender name="OVEROPS-ADMIN"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${catalina.home}/logs/${overops-admin}</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss} - %msg%n
+            </Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>
+                ${catalina.home}/logs/overops-admin-archived/${overops-admin}.%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="com.overops" level="debug"
+            additivity="false">
+        <appender-ref ref="OVEROPS-ADMIN"/>
+    </logger>
+    <root level="INFO">
+        <appender-ref ref="OVEROPS-ADMIN"/>
+        <appender-ref ref="OVEROPS-HTTP"/>
+    </root>
+</configuration>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<atlassian-plugin key="${project.groupId}.${project.artifactId}"
+	name="${project.name}" plugins-version="2">
+	<plugin-info>
+		<description>${project.description}</description>
+		<version>${project.version}</version>
+		<vendor name="${project.organization.name}" url="${project.organization.url}" />
+		<param name="plugin-icon">images/pluginIcon.png</param>
+		<param name="plugin-logo">images/pluginOverOpsLogo.png</param>
+	</plugin-info>
+
+	<!-- add our i18n resource -->
+	<resource type="i18n" name="i18n" location="OverOps"/>
+
+	<!-- add our web resources -->
+	<web-resource key="OverOpsResources" name="OverOpsResources">
+		<dependency>com.atlassian.auiplugin:ajs</dependency>
+		<resource type="download" name="OverOps.css"
+			location="css/OverOps.css" />
+		<resource type="download" name="OverOps.js"
+			location="js/OverOps.js" />
+		<context>atl.general</context>
+	</web-resource>
+
+	<!-- import from the product container -->
+	<component-import key="velocity-renderer" interface="com.atlassian.templaterenderer.TemplateRenderer" />
+
+	<servlet key="admin-servlet"
+		class="com.overops.plugins.bamboo.servlet.AdminServlet">
+		<url-pattern>/overops/admin</url-pattern>
+	</servlet>
+
+	<component-import key="pluginSettingsFactory"
+		interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" />
+	<component-import key="transactionTemplate"
+		interface="com.atlassian.sal.api.transaction.TransactionTemplate" />
+
+	<component-import key="applicationProperties"
+		interface="com.atlassian.sal.api.ApplicationProperties" />
+	<template-context-item key="applicationPropertiesContextItem"
+		component-ref="applicationProperties" context-key="applicationProperties"
+		name="Application Properties Context Item" />
+
+	<web-section name="OverOpsAdministration" i18n-name-key="overops-administration.name"
+		key="overops-administration" location="system.admin" weight="10">
+		<description key="overops-administration.description">The OverOps Administration Plugin
+		</description>
+		<label key="overops-administration.label" />
+	</web-section>
+	<web-item name="UserKeySettingsPage" i18n-name-key="user-key-settingspage.name"
+		key="user-key-settingspage" section="system.admin/overops-administration"
+		weight="10">
+		<description key="user-key-settingspage.description">The User Key Settings page Plugin
+		</description>
+		<label key="user-key-settingspage.label"></label>
+		<link linkId="user-key-settingspage-link">/plugins/servlet/overops/admin</link>
+	</web-item>
+	<preJobAction key="settingsProcessor" class="com.overops.plugins.bamboo.SettingsProcessor">
+		<description>Checks if settings are still valid for the job</description>
+	</preJobAction>
+
+	<taskType key="overops-task" name="OverOps Quality Test"
+		class="com.overops.plugins.bamboo.TaskType">
+		<help link="overops.task.help.link" title="overops.task.help.title" />
+		<description>Execute the OverOps Quality tests as part of your build
+		</description>
+		<category name="builder" />
+		<category name="test" />
+		<configuration
+			class="com.overops.plugins.bamboo.configuration.ConfigTask" />
+		<resource type="freemarker" name="edit"
+			location="templates/editConfigTask.ftl" />
+		<resource type="freemarker" name="view"
+			location="templates/viewConfigTask.ftl" />
+		<resource type="download" name="icon" location="images/pluginOverOpsLogo.png" />
+	</taskType>
+
+	<xwork key="overOpsReports" name="View OverOps Reports">
+		<package name="overOpsReportView" extends="buildResultView">
+			<action name="viewOverOpsReport"	class="com.overops.plugins.bamboo.ui.ViewOverOpsReport">
+				<result name="success" type="freemarker">/templates/viewOverOpsReport.ftl</result>
+			</action>
+		</package>
+	</xwork>
+
+	<!-- Build Report -->
+	<web-item name="OverOpsQualityReport" key="overopsQualityReport" section="chainResults.subMenu/chainResults" weight="80">
+		<description key="overopsQualityReport.description">Display the OverOps Report page</description>
+		<label key="overopsQualityReport.label" />
+		<link linkId="overopsQualityReport">/build/result/viewOverOpsReport.action?buildKey=${buildKey}&amp;buildNumber=${buildNumber}</link>
+		<condition class="com.overops.plugins.bamboo.ui.ViewOverOpsReportCondition" />
+	</web-item>
+
+	<!-- Build Report -->
+	<web-item name="OverOpsReportPageStage" key="overopsQualityReportStage" section="results.subMenu/results" weight="80">
+		<description key="overopsQualityReport.description">Display the OverOps Report page</description>
+		<label key="overopsQualityReport.label" />
+		<link linkId="overopsQualityReport">/build/result/viewOverOpsReport.action?buildKey=${buildKey}&amp;buildNumber=${buildNumber}</link>
+		<condition class="com.overops.plugins.bamboo.ui.ViewOverOpsReportCondition" />
+	</web-item>
+
+</atlassian-plugin>

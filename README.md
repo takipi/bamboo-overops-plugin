@@ -1,6 +1,6 @@
-#Bamboo OverOps Quality Gates Plugin
+# Bamboo OverOps Quality Gates Plugin
 
-##Build steps
+## Build steps
 
  ##### 1. Install Atlassian SDK
  * Mac OS (HomeBrew)
@@ -49,7 +49,7 @@
     <br /> `sudo mv /opt/atlassian-plugin-sdk-4.0 /opt/atlassian-plugin-sdk `
     5. [Next: Verify that you have set up the SDK correctly](https://developer.atlassian.com/display/DOCS/Install+the+Atlassian+SDK+on+a+Linux+or+Mac+system#InstalltheAtlassianSDKonaLinuxorMacsystem-step3Step3:VerifythatyouhavesetuptheSDKcorrectly)
     
- #####2. Verify that you have set up the SDK correctly
+ ##### 2. Verify that you have set up the SDK correctly
  * Open a terminal window and run the following command:
  <br /> `atlas-version`
  <br /> `ATLAS Version:    6.2.9`
@@ -67,7 +67,7 @@
  <br /> `Default locale: en_US, platform encoding: UTF-8`
  <br /> `OS name: "mac os x", version: "10.11.6", arch: "x86_64", family: "mac"`
  
- #####3. NOTICE
+ ##### 3. NOTICE
  * in the future use [`atlas-mvn`](https://developer.atlassian.com/server/framework/atlassian-sdk/atlas-mvn/) instead of `mvn`
  <br /> `atlas-mvn [options]`
  <br /> `atlas-mvn -help`

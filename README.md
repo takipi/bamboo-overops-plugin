@@ -100,7 +100,7 @@ The OverOps REST API token to use for authentication. This can be obtained from 
 
 #### Deployment Name
 
-**Example:** ${bamboo.buildNumber} or ${bamboo.planName}-${bamboo.buildNumber}
+**Example:** ${bamboo.buildNumber} or ${bamboo.shortJobName}-${bamboo.buildNumber}
 
 *(Optional)* [Deployment Name](https://doc.overops.com/docs/naming-your-application-server-deployment) as specified in OverOps or use Jenkins environment variables.
 

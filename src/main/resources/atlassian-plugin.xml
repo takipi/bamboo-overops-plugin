@@ -39,7 +39,7 @@
 
 	<web-section name="OverOpsAdministration" i18n-name-key="overops-administration.name"
 		key="overops-administration" location="system.admin" weight="10">
-		<description key="overops-administration.description">The OverOps Administration Plugin
+		<description key="overops-administration.description">The OverOps Configuration Plugin
 		</description>
 		<label key="overops-administration.label" />
 	</web-section>

@@ -25,7 +25,14 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
         String env = (String) pluginSettings.get(Const.API_ENV);
+        String url = (String) pluginSettings.get(Const.API_URL);
+        String token = (String) pluginSettings.get(Const.API_TOKEN);
+        context.put(Const.API_URL, url);
+        context.put(Const.API_TOKEN, token);
         context.put(Const.SERVICE_ID, env);
+
+        context.put(Const.APP_NAME, Const.DEFAULT_JOB_NAME);
+        context.put(Const.DEP_NAME, Const.DEFAULT_DEPLOYMENT_NAME);
 
         context.put(Const.FIELD_CHECK_NEW_ERROR, Const.DEFAULT_CHECK_NEW_ERROR);
         context.put(Const.FIELD_CHECK_RESURFACED_ERRORS, Const.DEFAULT_CHECK_RESURFACED_ERRORS);
@@ -55,10 +62,16 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         super.populateContextForEdit(context, taskDefinition);
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
         String env = (String) pluginSettings.get(Const.API_ENV);
+        String url = (String) pluginSettings.get(Const.API_URL);
+        String token = (String) pluginSettings.get(Const.API_TOKEN);
         Map<String, String> config = taskDefinition.getConfiguration();
 
-        context.put(Const.APP_NAME, config.get(Const.APP_NAME));
-        context.put(Const.DEP_NAME, config.get(Const.DEP_NAME));
+        context.put(Const.API_URL, Optional.ofNullable(config.get(Const.API_URL)).filter(StringUtils::hasText).orElse(url));
+        context.put(Const.API_TOKEN, Optional.ofNullable(config.get(Const.API_TOKEN)).filter(StringUtils::hasText).orElse(token));
+
+        context.put(Const.APP_NAME, Optional.ofNullable(config.get(Const.APP_NAME)).filter(StringUtils::hasText).orElse(Const.DEFAULT_JOB_NAME));
+        context.put(Const.DEP_NAME, Optional.ofNullable(config.get(Const.DEP_NAME)).filter(StringUtils::hasText).orElse(Const.DEFAULT_DEPLOYMENT_NAME));
+
         context.put(Const.SERVICE_ID, Optional.ofNullable(config.get(Const.SERVICE_ID)).filter(StringUtils::hasText).orElse(env));
         context.put(Const.REGEX_FILTER, config.get(Const.REGEX_FILTER));
         context.put(Const.MARK_UNSTABLE, config.get(Const.MARK_UNSTABLE));
@@ -83,8 +96,6 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         context.put(Const.FIELD_UNIQUE_ERRORS, Optional.ofNullable(config.get(Const.FIELD_UNIQUE_ERRORS)).filter(StringUtils::hasText).orElse(null));
         context.put(Const.FIELD_CRITICAL_ERRORS, Optional.ofNullable(config.get(Const.FIELD_CRITICAL_ERRORS)).filter(StringUtils::hasText).orElse(null));
         context.put(Const.FIELD_REGRESSIONS_ERROR, Optional.ofNullable(config.get(Const.FIELD_REGRESSIONS_ERROR)).filter(StringUtils::hasText).orElse(null));
-        System.out.println(config.get(Const.FIELD_CHECK_NEW_ERROR));
-
     }
 
 //
@@ -93,10 +104,14 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 //     */
     @Override
     public Map<String, String> generateTaskConfigMap(ActionParametersMap params, TaskDefinition previousTaskDefinition) {
+        PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
         final Map<String, String> config = super.generateTaskConfigMap(params, previousTaskDefinition);
 
-        config.put(Const.APP_NAME, Optional.ofNullable(params.getString(Const.APP_NAME)).filter(StringUtils::hasText).orElse(null));
-        config.put(Const.DEP_NAME, Optional.ofNullable(params.getString(Const.DEP_NAME)).filter(StringUtils::hasText).orElse(null));
+        config.put(Const.API_URL, Optional.ofNullable(params.getString(Const.API_URL)).filter(StringUtils::hasText).orElse((String) pluginSettings.get(Const.API_URL)));
+        config.put(Const.API_TOKEN, Optional.ofNullable(params.getString(Const.API_TOKEN)).filter(StringUtils::hasText).orElse((String) pluginSettings.get(Const.API_TOKEN)));
+
+        config.put(Const.APP_NAME, Optional.ofNullable(params.getString(Const.APP_NAME)).filter(StringUtils::hasText).orElse(Const.DEFAULT_JOB_NAME));
+        config.put(Const.DEP_NAME, Optional.ofNullable(params.getString(Const.DEP_NAME)).filter(StringUtils::hasText).orElse(Const.DEFAULT_DEPLOYMENT_NAME));
         config.put(Const.SERVICE_ID, Optional.ofNullable(params.getString(Const.SERVICE_ID)).filter(StringUtils::hasText).orElse(null));
         config.put(Const.REGEX_FILTER, Optional.ofNullable(params.getString(Const.REGEX_FILTER)).filter(StringUtils::hasText).orElse(null));
         config.put(Const.MARK_UNSTABLE, Optional.ofNullable(params.getString(Const.MARK_UNSTABLE)).filter(StringUtils::hasText).orElse(null));
@@ -124,13 +139,8 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         config.put(Const.FIELD_REGRESSIONS_ERROR, Optional.ofNullable(params.getString(Const.FIELD_REGRESSIONS_ERROR)).filter(StringUtils::hasText).orElse(null));
 
 
-        PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        config.put(Const.API_URL,
-                (String) pluginSettings.get(Const.API_URL));
         config.put(Const.API_ENV,
                 (String) pluginSettings.get(Const.API_ENV));
-        config.put(Const.API_TOKEN,
-                (String) pluginSettings.get(Const.API_TOKEN));
         return config;
     }
 }

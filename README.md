@@ -91,12 +91,16 @@ The OverOps REST API token to use for authentication. This can be obtained from 
 
 #### Application Name
 
+**Example:** ${bamboo.shortJobName}
+
 *(Optional)* [Application Name](https://doc.overops.com/docs/naming-your-application-server-deployment) as specified in OverOps
 
 * If populated, the plugin will filter the data for the specific application in OverOps.
 * If blank, no application filter will be applied in query.
 
 #### Deployment Name
+
+**Example:** ${bamboo.buildNumber} or ${bamboo.planName}-${bamboo.buildNumber}
 
 *(Optional)* [Deployment Name](https://doc.overops.com/docs/naming-your-application-server-deployment) as specified in OverOps or use Jenkins environment variables.
 

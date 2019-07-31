@@ -58,4 +58,8 @@ public class Const {
     public static final String DEFAULT_CRITICAL_REGRESSION_DELTA = "0";
     public static final String DEFAULT_APPLY_SEASONALITY = "false";
     public static final String DEFAULT_DEBUG = "false";
+
+    public static final String DEFAULT_JOB_NAME = "${bamboo.shortJobName}";
+    public static final String DEFAULT_DEPLOYMENT_NAME = "${bamboo.shortJobName}-${bamboo.buildNumber}";
+
 }

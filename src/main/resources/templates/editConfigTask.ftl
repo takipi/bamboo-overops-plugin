@@ -12,6 +12,8 @@
     }
 </style>
 
+[@ww.textfield labelKey="overops.admin.url" name="url" required='false'/]
+[@ww.textfield labelKey="overops.admin.token" name="token" required='false'/]
 
 [@ww.textfield labelKey="overops.config.applicationName" name="applicationName" required='false'/]
 [@ww.textfield labelKey="overops.config.deploymentName" name="deploymentName" required='false'/]

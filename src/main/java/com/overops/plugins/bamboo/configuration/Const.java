@@ -10,7 +10,7 @@ public class Const {
     public static final String DEFAULT_URL = "https://api.overops.com";
 
     public static final String URL = "url";
-    public static final String ENV_ID = "evnId";
+    public static final String ENV_ID = "envId";
     public static final String TOKEN = "token";
     public static final String APP_NAME = "applicationName";
     public static final String DEP_NAME = "deploymentName";

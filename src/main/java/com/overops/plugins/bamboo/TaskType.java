@@ -38,6 +38,9 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         final BuildLogger logger = context.getBuildLogger();
         logger.addBuildLogEntry("Executing OverOps task...");
         logger.addBuildLogEntry("OverOpsBamboo plugin v." + Utils.getVersion());
+        logger.addBuildLogEntry("-------------");
+        logger.addBuildLogEntry(context.getConfigurationMap().toString());
+        logger.addBuildLogEntry("-------------");
         QueryOverOps query = QueryOverOps.mapToObject(context.getConfigurationMap());
         try {
             ReportBuilder.QualityReport report = overOpsService.perform(query, logger);

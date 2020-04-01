@@ -36,7 +36,7 @@ public class OverOpsServiceImpl implements OverOpsService {
             printStream = null;
         }
 
-        pauseForTheCause(printStream);
+        // pauseForTheCause(printStream);
 
         validateInputs(queryOverOps, printStream);
 

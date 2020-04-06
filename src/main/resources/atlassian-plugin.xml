@@ -73,6 +73,7 @@
 
 	<!-- overops quality report page -->
 	<xwork key="overops-report" name="Quality Report">
+		<description>OverOps Quality Report template</description>
 		<package name="overOpsReportView" extends="buildResultView">
 			<action name="viewOverOpsReport" class="com.overops.plugins.bamboo.ui.ViewOverOpsReport">
 				<result name="success" type="freemarker">/templates/viewOverOpsReport.ftl</result>

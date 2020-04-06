@@ -9,7 +9,7 @@
         <bamboo.data.version>5.7.2</bamboo.data.version>
         <amps.version>6.3.6</amps.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
-        <version.takipi>2.23.0</version.takipi>
+        <version.takipi>2.32.0</version.takipi>
     </properties>
 
 
@@ -17,8 +17,15 @@
     <artifactId>bamboo</artifactId>
     <version>1.0.0</version>
 
-    <name>OverOps Quality test</name>
-    <description>This plugin will check a build for errors in OverOps.</description>
+    <name>OverOps Quality Report</name>
+    <description>
+        This app provides a mechanism for applying OverOps severity assignment and regression analysis
+        to new builds to allow application owners, DevOps engineers, and SREs to determine the quality of
+        their code before promoting it into production. Run the OverOps Quality Report task after all
+        other testing is complete to generate a Quality Report that will determine the stability of the
+        build. From the Quality Report you can drill down into each specific error using the OverOps
+        Automated Root Cause analysis screen to solve the issue.
+    </description>
     <url>https://github.com/takipi/bamboo-overops-plugin</url>
     <packaging>atlassian-plugin</packaging>
 

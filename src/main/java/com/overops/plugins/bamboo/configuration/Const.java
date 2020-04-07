@@ -1,13 +1,23 @@
 package com.overops.plugins.bamboo.configuration;
 
 public class Const {
-    public static final String PLUGIN_KEY="com.overops.plugins.bamboo.OverOps:overops";
+    // admin servlet
     public static final String ERROR = "error";
     public static final String INFO = "info";
-    public static final String API_URL = "url";
-    public static final String API_ENV = "env";
-    public static final String API_TOKEN = "token";
-    public static final String DEFAULT_URL = "https://api.overops.com";
+
+    /**
+     *  keys for PluginSettingsFactory.createGlobalSettings()
+     *  plugins are advised to namespace the key with something unique to the plugin
+     *  (for example "com.example.plugin:key-I-would-like-to-use" ) to avoid clashes with other keys
+     */
+
+    // global admin settings
+    public static final String GLOBAL_API_URL = "com.overops.plugins.bamboo:global-api-url";
+    public static final String GLOBAL_API_ENV_ID = "com.overops.plugins.bamboo:global-api-env-id";
+    public static final String GLOBAL_API_TOKEN = "com.overops.plugins.bamboo:global-api-token";
+
+    // default values
+    public static final String DEFAULT_API_URL = "https://api.overops.com/";
 
     public static final String URL = "url";
     public static final String ENV_ID = "envId";

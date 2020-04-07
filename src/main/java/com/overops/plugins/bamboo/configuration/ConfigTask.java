@@ -24,11 +24,11 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         super.populateContextForCreate(context);
 
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        String env = (String) pluginSettings.get(Const.API_ENV);
-        String url = (String) pluginSettings.get(Const.API_URL);
-        String token = (String) pluginSettings.get(Const.API_TOKEN);
-        context.put(Const.API_URL, url);
-        context.put(Const.API_TOKEN, token);
+        String env = (String) pluginSettings.get(Const.GLOBAL_API_ENV_ID);
+        String url = (String) pluginSettings.get(Const.GLOBAL_API_URL);
+        String token = (String) pluginSettings.get(Const.GLOBAL_API_TOKEN);
+        context.put(Const.GLOBAL_API_URL, url);
+        context.put(Const.GLOBAL_API_TOKEN, token);
         context.put(Const.SERVICE_ID, env);
 
         context.put(Const.APP_NAME, Const.DEFAULT_JOB_NAME);
@@ -61,13 +61,13 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
     public void populateContextForEdit(Map<String, Object> context, TaskDefinition taskDefinition) {
         super.populateContextForEdit(context, taskDefinition);
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        String env = (String) pluginSettings.get(Const.API_ENV);
-        String url = (String) pluginSettings.get(Const.API_URL);
-        String token = (String) pluginSettings.get(Const.API_TOKEN);
+        String env = (String) pluginSettings.get(Const.GLOBAL_API_ENV_ID);
+        String url = (String) pluginSettings.get(Const.GLOBAL_API_URL);
+        String token = (String) pluginSettings.get(Const.GLOBAL_API_TOKEN);
         Map<String, String> config = taskDefinition.getConfiguration();
 
-        context.put(Const.API_URL, Optional.ofNullable(config.get(Const.API_URL)).filter(StringUtils::hasText).orElse(url));
-        context.put(Const.API_TOKEN, Optional.ofNullable(config.get(Const.API_TOKEN)).filter(StringUtils::hasText).orElse(token));
+        context.put(Const.GLOBAL_API_URL, Optional.ofNullable(config.get(Const.GLOBAL_API_URL)).filter(StringUtils::hasText).orElse(url));
+        context.put(Const.GLOBAL_API_TOKEN, Optional.ofNullable(config.get(Const.GLOBAL_API_TOKEN)).filter(StringUtils::hasText).orElse(token));
 
         context.put(Const.APP_NAME, Optional.ofNullable(config.get(Const.APP_NAME)).filter(StringUtils::hasText).orElse(Const.DEFAULT_JOB_NAME));
         context.put(Const.DEP_NAME, Optional.ofNullable(config.get(Const.DEP_NAME)).filter(StringUtils::hasText).orElse(Const.DEFAULT_DEPLOYMENT_NAME));
@@ -107,8 +107,8 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
         final Map<String, String> config = super.generateTaskConfigMap(params, previousTaskDefinition);
 
-        config.put(Const.API_URL, Optional.ofNullable(params.getString(Const.API_URL)).filter(StringUtils::hasText).orElse((String) pluginSettings.get(Const.API_URL)));
-        config.put(Const.API_TOKEN, Optional.ofNullable(params.getString(Const.API_TOKEN)).filter(StringUtils::hasText).orElse((String) pluginSettings.get(Const.API_TOKEN)));
+        config.put(Const.GLOBAL_API_URL, Optional.ofNullable(params.getString(Const.GLOBAL_API_URL)).filter(StringUtils::hasText).orElse((String) pluginSettings.get(Const.GLOBAL_API_URL)));
+        config.put(Const.GLOBAL_API_TOKEN, Optional.ofNullable(params.getString(Const.GLOBAL_API_TOKEN)).filter(StringUtils::hasText).orElse((String) pluginSettings.get(Const.GLOBAL_API_TOKEN)));
 
         config.put(Const.APP_NAME, Optional.ofNullable(params.getString(Const.APP_NAME)).filter(StringUtils::hasText).orElse(Const.DEFAULT_JOB_NAME));
         config.put(Const.DEP_NAME, Optional.ofNullable(params.getString(Const.DEP_NAME)).filter(StringUtils::hasText).orElse(Const.DEFAULT_DEPLOYMENT_NAME));
@@ -139,8 +139,8 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         config.put(Const.FIELD_REGRESSIONS_ERROR, Optional.ofNullable(params.getString(Const.FIELD_REGRESSIONS_ERROR)).filter(StringUtils::hasText).orElse(null));
 
 
-        config.put(Const.API_ENV,
-                (String) pluginSettings.get(Const.API_ENV));
+        config.put(Const.GLOBAL_API_ENV_ID,
+                (String) pluginSettings.get(Const.GLOBAL_API_ENV_ID));
         return config;
     }
 }

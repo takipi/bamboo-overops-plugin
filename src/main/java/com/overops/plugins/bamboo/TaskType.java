@@ -6,6 +6,7 @@ import com.atlassian.bamboo.task.TaskContext;
 import com.atlassian.bamboo.task.TaskException;
 import com.atlassian.bamboo.task.TaskResult;
 import com.atlassian.bamboo.task.TaskResultBuilder;
+
 import com.overops.plugins.bamboo.model.OverOpsReportModel;
 import com.overops.plugins.bamboo.model.QueryOverOps;
 import com.overops.plugins.bamboo.service.OverOpsService;
@@ -17,6 +18,11 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+
+// debugging
+import static com.overops.plugins.bamboo.configuration.Const.GLOBAL_API_ENV_ID;
+import static com.overops.plugins.bamboo.configuration.Const.GLOBAL_API_TOKEN;
+import static com.overops.plugins.bamboo.configuration.Const.GLOBAL_API_URL;
 
 @Component
 public class TaskType implements com.atlassian.bamboo.task.TaskType {
@@ -34,11 +40,15 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
     @NotNull
     @Override
     public TaskResult execute(@NotNull TaskContext context) throws TaskException {
+
         TaskResultBuilder resultBuilder = TaskResultBuilder.newBuilder(context);
         final BuildLogger logger = context.getBuildLogger();
         logger.addBuildLogEntry("Executing OverOps task...");
         logger.addBuildLogEntry("OverOpsBamboo plugin v." + Utils.getVersion());
-        logger.addBuildLogEntry("-------------");
+        logger.addBuildLogEntry("-------------"); // debugging
+        logger.addBuildLogEntry(context.getConfigurationMap().get(GLOBAL_API_URL));
+        logger.addBuildLogEntry(context.getConfigurationMap().get(GLOBAL_API_ENV_ID));
+        logger.addBuildLogEntry(context.getConfigurationMap().get(GLOBAL_API_TOKEN));
         logger.addBuildLogEntry(context.getConfigurationMap().toString());
         logger.addBuildLogEntry("-------------");
         QueryOverOps query = QueryOverOps.mapToObject(context.getConfigurationMap());

@@ -212,7 +212,7 @@ public class QueryOverOps {
     public static QueryOverOps mapToObject(ConfigurationMap params) {
         QueryOverOps queryOverOps = new QueryOverOps();
         queryOverOps.overOpsURL = params.get(GLOBAL_API_URL);
-        queryOverOps.overOpsSID = params.get(GLOBAL_API_ENV_ID);
+        queryOverOps.overOpsSID = params.get(GLOBAL_ENV_ID);
         queryOverOps.overOpsAPIKey = params.get(GLOBAL_API_TOKEN);
         queryOverOps.applicationName = params.get(APP_NAME);
         queryOverOps.deploymentName = params.get(DEP_NAME);

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 // debugging
-import static com.overops.plugins.bamboo.configuration.Const.GLOBAL_API_ENV_ID;
+import static com.overops.plugins.bamboo.configuration.Const.GLOBAL_ENV_ID;
 import static com.overops.plugins.bamboo.configuration.Const.GLOBAL_API_TOKEN;
 import static com.overops.plugins.bamboo.configuration.Const.GLOBAL_API_URL;
 
@@ -47,7 +47,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         logger.addBuildLogEntry("OverOpsBamboo plugin v." + Utils.getVersion());
         logger.addBuildLogEntry("-------------"); // debugging
         logger.addBuildLogEntry(context.getConfigurationMap().get(GLOBAL_API_URL));
-        logger.addBuildLogEntry(context.getConfigurationMap().get(GLOBAL_API_ENV_ID));
+        logger.addBuildLogEntry(context.getConfigurationMap().get(GLOBAL_ENV_ID));
         logger.addBuildLogEntry(context.getConfigurationMap().get(GLOBAL_API_TOKEN));
         logger.addBuildLogEntry(context.getConfigurationMap().toString());
         logger.addBuildLogEntry("-------------");

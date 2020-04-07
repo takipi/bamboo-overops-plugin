@@ -9,7 +9,9 @@
         <bamboo.data.version>5.7.2</bamboo.data.version>
         <amps.version>6.3.6</amps.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
-        <version.takipi>2.32.0</version.takipi>
+        <!-- working: 2.29.0 -->
+        <!-- broken: 2.30.0, 2.31.0, 2.32.0 -->
+        <takipi.version>2.29.0</takipi.version>
     </properties>
 
 
@@ -87,7 +89,7 @@
         <dependency>
             <groupId>com.takipi</groupId>
             <artifactId>api-client</artifactId>
-            <version>${version.takipi}</version>
+            <version>${takipi.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -98,7 +100,7 @@
         <dependency>
             <groupId>com.takipi</groupId>
             <artifactId>api-client-util</artifactId>
-            <version>${version.takipi}</version>
+            <version>${takipi.version}</version>
         </dependency>
     </dependencies>
     <build>

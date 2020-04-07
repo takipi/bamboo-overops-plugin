@@ -24,7 +24,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         super.populateContextForCreate(context);
 
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        String env = (String) pluginSettings.get(Const.GLOBAL_API_ENV_ID);
+        String env = (String) pluginSettings.get(Const.GLOBAL_ENV_ID);
         String url = (String) pluginSettings.get(Const.GLOBAL_API_URL);
         String token = (String) pluginSettings.get(Const.GLOBAL_API_TOKEN);
         context.put(Const.GLOBAL_API_URL, url);
@@ -61,7 +61,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
     public void populateContextForEdit(Map<String, Object> context, TaskDefinition taskDefinition) {
         super.populateContextForEdit(context, taskDefinition);
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        String env = (String) pluginSettings.get(Const.GLOBAL_API_ENV_ID);
+        String env = (String) pluginSettings.get(Const.GLOBAL_ENV_ID);
         String url = (String) pluginSettings.get(Const.GLOBAL_API_URL);
         String token = (String) pluginSettings.get(Const.GLOBAL_API_TOKEN);
         Map<String, String> config = taskDefinition.getConfiguration();
@@ -139,8 +139,8 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         config.put(Const.FIELD_REGRESSIONS_ERROR, Optional.ofNullable(params.getString(Const.FIELD_REGRESSIONS_ERROR)).filter(StringUtils::hasText).orElse(null));
 
 
-        config.put(Const.GLOBAL_API_ENV_ID,
-                (String) pluginSettings.get(Const.GLOBAL_API_ENV_ID));
+        config.put(Const.GLOBAL_ENV_ID,
+                (String) pluginSettings.get(Const.GLOBAL_ENV_ID));
         return config;
     }
 }

@@ -1,9 +1,6 @@
 package com.overops.plugins.bamboo.configuration;
 
 public class Const {
-    // admin servlet
-    public static final String ERROR = "error";
-    public static final String INFO = "info";
 
     /**
      *  keys for PluginSettingsFactory.createGlobalSettings()
@@ -12,16 +9,13 @@ public class Const {
      */
 
     // global admin settings
+    public static final String GLOBAL_ENV_ID = "com.overops.plugins.bamboo:global-api-env-id";
     public static final String GLOBAL_API_URL = "com.overops.plugins.bamboo:global-api-url";
-    public static final String GLOBAL_API_ENV_ID = "com.overops.plugins.bamboo:global-api-env-id";
     public static final String GLOBAL_API_TOKEN = "com.overops.plugins.bamboo:global-api-token";
 
     // default values
     public static final String DEFAULT_API_URL = "https://api.overops.com/";
 
-    public static final String URL = "url";
-    public static final String ENV_ID = "envId";
-    public static final String TOKEN = "token";
     public static final String APP_NAME = "applicationName";
     public static final String DEP_NAME = "deploymentName";
     public static final String SERVICE_ID = "serviceId";

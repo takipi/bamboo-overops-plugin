@@ -12,12 +12,6 @@
 	<!-- add default localized strings: https://developer.atlassian.com/server/framework/atlassian-sdk/internationalising-your-plugin/ -->
 	<resource type="i18n" name="overops" location="com.overops.plugins.bamboo.overops"/>
 
-	<!-- add our web resources: https://developer.atlassian.com/server/jira/platform/web-resource/ -->
-	<!-- <web-resource key="OverOpsResources" name="OverOpsResources">
-		<dependency>com.atlassian.auiplugin:ajs</dependency>
-		<context>atl.general</context>
-	</web-resource> -->
-
 	<!-- render velocity templates -->
 	<component-import name="Velocity Renderer" key="velocity-renderer"
 		interface="com.atlassian.templaterenderer.TemplateRenderer" />

@@ -18,9 +18,7 @@ import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.takipi.api.client.ApiClient;
 import com.takipi.api.client.RemoteApiClient;
 import com.takipi.api.client.util.client.ClientUtil;
-import com.takipi.api.core.url.UrlClient;
-import com.takipi.api.core.url.UrlClient.Response;
-import com.takipi.api.client.data.service.SummarizedService;;
+import com.takipi.api.client.data.service.SummarizedService;
 
 import com.overops.plugins.bamboo.configuration.Const;
 
@@ -126,8 +124,6 @@ public class AdminServlet extends HttpServlet {
                 .setHostname(url)
                 .setApiKey(token)
                 .build();
-
-            Response<String> response = apiClient.get(url + "/api/v1/test", null, "application/json");
 
             if (!apiClient.validateConnection()) {
                 // error - can't connect to host

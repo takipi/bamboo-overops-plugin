@@ -4,18 +4,10 @@
     <meta name="decorator" content="atl.admin">
   </head>
   <body>
-    <h1>OverOps default settings</h1>
-    <p>Default settings will be used if not set at the project level.</p>
+    <h1>OverOps settings</h1>
 
     <form id="overopsSettingsForm" name="overopsSettingsForm" action="" method="post" class="aui">
       <div class="form-content-container">
-        <div class="field-group">
-          <label for="name">Environment ID</label>
-          <input type="text" id="envId" name="envId" class="text" value="${envId}">
-          <div class="description">
-            The OverOps environment identifier (e.g. S12345)
-          </div>
-        </div>
         <div class="field-group">
           <label for="name">API URL</label>
           <input type="text" id="apiUrl" name="apiUrl" class="text" value="${apiUrl}">
@@ -28,6 +20,13 @@
           <input type="password" id="apiToken" name="apiToken" class="text" value="${apiToken}">
           <div class="description">
             The OverOps REST API token to use for authentication. This can be obtained from the OverOps dashboard under Settings &rarr; Account.
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="name">Environment ID</label>
+          <input type="text" id="envId" name="envId" class="text" value="${envId}">
+          <div class="description">
+            The OverOps default environment identifier (e.g. S12345)
           </div>
         </div>
 

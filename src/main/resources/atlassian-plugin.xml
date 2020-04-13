@@ -42,26 +42,25 @@
 		<label key="com.overops.plugins.bamboo.admin.label" />
 	</web-section>
 
-	<!-- adds default settings page to overops section -->
-	<web-item name="Default settings page" i18n-name-key="com.overops.plugins.bamboo.default.settings.name"
+	<!-- adds settings page to overops section -->
+	<web-item name="Settings page" i18n-name-key="com.overops.plugins.bamboo.settings.name"
 		key="overops-settings" section="system.admin/overops-administration"
 		weight="10">
-		<description key="com.overops.plugins.bamboo.default.settings.description">
-			OverOps default settings page
+		<description key="com.overops.plugins.bamboo.settings.description">
+			OverOps settings page
 		</description>
-		<label key="com.overops.plugins.bamboo.default.settings.label"></label>
-		<link linkId="com.overops.plugins.bamboo.default.settings.link">/plugins/servlet/overops/admin</link>
+		<label key="com.overops.plugins.bamboo.settings.label"></label>
+		<link linkId="com.overops.plugins.bamboo.settings.link">/plugins/servlet/overops/admin</link>
 	</web-item>
 
 	<!-- overops quality report task -->
 	<taskType key="overops-task" name="Quality Report" class="com.overops.plugins.bamboo.TaskType">
 		<help link="com.overops.plugins.bamboo.task.help.link" title="com.overops.plugins.bamboo.task.help.title" />
-		<description>OverOps Quality Report build task</description>
+		<description>Generates an OverOps Quality Report for your build</description>
 		<category name="builder" />
 		<category name="test" />
-		<configuration class="com.overops.plugins.bamboo.configuration.ConfigTask" />
-		<resource type="freemarker" name="edit" location="templates/editConfigTask.ftl" />
-		<resource type="freemarker" name="view" location="templates/viewConfigTask.ftl" />
+		<configuration class="com.overops.plugins.bamboo.configuration.TaskConfiguration" />
+		<resource type="freemarker" name="edit" location="templates/editTaskConfig.ftl" />
 		<resource type="download" name="icon" location="images/pluginOverOpsLogo.png" />
 	</taskType>
 
@@ -77,16 +76,16 @@
 
 	<!--overops quality report tab (job overview selected) -->
 	<web-item key="overops-report-job-tab" name="Quality Report" section="chainResults.subMenu/chainResults" weight="80">
-		<description key="overopsQualityReport.description">Link to OverOps Quality Report from job</description>
-		<label key="overopsQualityReport.label" />
+		<description>Link to OverOps Quality Report from job</description>
+		<label key="com.overops.plugins.bamboo.report.label" />
 		<link linkId="overopsQualityReport">/build/result/viewOverOpsReport.action?buildKey=${buildKey}&amp;buildNumber=${buildNumber}</link>
 		<condition class="com.overops.plugins.bamboo.ui.ViewOverOpsReportCondition" />
 	</web-item>
 
 	<!-- overops quality report tab (overops stage selected) -->
 	<web-item key="overops-report-stage-tab" name="Quality Report" section="results.subMenu/results" weight="80">
-		<description key="overopsQualityReport.description">Link to OverOps Quality Report from stage</description>
-		<label key="overopsQualityReport.label" />
+		<description>Link to OverOps Quality Report from stage</description>
+		<label key="com.overops.plugins.bamboo.report.label" />
 		<link linkId="overopsQualityReport">/build/result/viewOverOpsReport.action?buildKey=${buildKey}&amp;buildNumber=${buildNumber}</link>
 		<condition class="com.overops.plugins.bamboo.ui.ViewOverOpsReportCondition" />
 	</web-item>

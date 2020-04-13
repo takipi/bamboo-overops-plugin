@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 @Component
 public class OverOpsServiceImpl implements OverOpsService {
-    private static final String SEPERATOR = ",";
+    private static final String SEPARATOR = ",";
     private boolean runRegressions = false;
 
     @Override
@@ -40,46 +40,46 @@ public class OverOpsServiceImpl implements OverOpsService {
 
         validateInputs(queryOverOps, printStream);
 
-        RemoteApiClient apiClient = (RemoteApiClient) RemoteApiClient.newBuilder().setHostname(queryOverOps.getOverOpsURL()).setApiKey(queryOverOps.getOverOpsAPIKey()).build();
+        RemoteApiClient apiClient = (RemoteApiClient) RemoteApiClient.newBuilder().setHostname(queryOverOps.getApiUrl()).setApiKey(queryOverOps.getApiToken()).build();
 
         if (Objects.nonNull(printStream) && (queryOverOps.isDebug())) {
             apiClient.addObserver(new ApiClientObserver(printStream, queryOverOps.isDebug()));
         }
 
-        SummarizedView allEventsView = ViewUtil.getServiceViewByName(apiClient, queryOverOps.getServiceId().toUpperCase(), "All Events");
+        SummarizedView allEventsView = ViewUtil.getServiceViewByName(apiClient, queryOverOps.getEnvId(), "All Events");
 
         if (Objects.isNull(allEventsView)) {
             if(Objects.nonNull(printStream)) {
-                printStream.println("Could not acquire ID for 'All Events'. Please check connection to " + queryOverOps.getOverOpsURL());
+                printStream.println("Could not acquire ID for 'All Events'. Please check connection to " + queryOverOps.getApiUrl());
             }
             throw new IllegalStateException(
-                    "Could not acquire ID for 'All Events'. Please check connection to " + queryOverOps.getOverOpsURL());
+                    "Could not acquire ID for 'All Events'. Please check connection to " + queryOverOps.getApiUrl());
         }
 
         RegressionInput input = setupRegressionData(queryOverOps, allEventsView, printStream);
         return ReportBuilder.execute(apiClient, input, queryOverOps.getMaxErrorVolume(), queryOverOps.getMaxUniqueErrors(),
-                queryOverOps.getPrintTopIssues(), queryOverOps.getRegexFilter(), queryOverOps.isNewEvents(), queryOverOps.isResurfacedErrors(),
+                queryOverOps.getTopErrorCount(), queryOverOps.getRegexFilter(), queryOverOps.isNewEvents(), queryOverOps.isResurfacedErrors(),
                 runRegressions, queryOverOps.isMarkUnstable(), printStream, queryOverOps.isDebug());
 
     }
 
     //sleep for 30 seconds to ensure all data is in OverOps
-    private static void pauseForTheCause(PrintStream printStream) {
-        if (Objects.nonNull(printStream)) {
-            printStream.println("Build Step: Starting OverOps Quality Gate....");
-        }
-        try {
-            Thread.sleep(30000);
-        } catch (Exception e) {
-            if (Objects.nonNull(printStream)) {
-                printStream.println("Can not hold the process.");
-            }
-        }
-    }
+    // private static void pauseForTheCause(PrintStream printStream) {
+    //     if (Objects.nonNull(printStream)) {
+    //         printStream.println("Build Step: Starting OverOps Quality Gate....");
+    //     }
+    //     try {
+    //         Thread.sleep(30000);
+    //     } catch (Exception e) {
+    //         if (Objects.nonNull(printStream)) {
+    //             printStream.println("Can not hold the process.");
+    //         }
+    //     }
+    // }
 
     private void validateInputs (QueryOverOps queryOverOps, PrintStream printStream) {
-        String apiHost = queryOverOps.getOverOpsURL();
-        String apiKey = queryOverOps.getOverOpsAPIKey();
+        String apiHost = queryOverOps.getApiUrl();
+        String apiKey = queryOverOps.getApiToken();
 
         if (StringUtils.isEmpty(apiHost)) {
             throw new IllegalArgumentException("Missing host name");
@@ -104,7 +104,7 @@ public class OverOpsServiceImpl implements OverOpsService {
         }
 
 
-        if (StringUtils.isEmpty(queryOverOps.getOverOpsSID())) {
+        if (StringUtils.isEmpty(queryOverOps.getEnvId())) {
             throw new IllegalArgumentException("Missing environment Id");
         }
 
@@ -114,7 +114,7 @@ public class OverOpsServiceImpl implements OverOpsService {
             throws InterruptedException, IOException {
 
         RegressionInput input = new RegressionInput();
-        input.serviceId = queryOverOps.getServiceId();
+        input.serviceId = queryOverOps.getEnvId();
         input.viewId = allEventsView.id;
         input.applictations = parseArrayString(queryOverOps.getApplicationName(), printStream, "Application Name");
         input.deployments = parseArrayString(queryOverOps.getDeploymentName(), printStream, "Deployment Name");
@@ -126,9 +126,9 @@ public class OverOpsServiceImpl implements OverOpsService {
             input.baselineTime = queryOverOps.getBaselineTimespan();
             input.baselineTimespan = convertToMinutes(queryOverOps.getBaselineTimespan());
             input.minVolumeThreshold = queryOverOps.getMinVolumeThreshold();
-            input.minErrorRateThreshold = queryOverOps.getMinErrorRateThreshold();
+            input.minErrorRateThreshold = queryOverOps.getMinRateThreshold();
             input.regressionDelta = queryOverOps.getRegressionDelta();
-            input.criticalRegressionDelta = queryOverOps.getCriticalRegressionDelta();
+            input.criticalRegressionDelta = queryOverOps.getCriticalRegressionThreshold();
             input.applySeasonality = queryOverOps.isApplySeasonality();
             input.validate();
         }
@@ -162,7 +162,7 @@ public class OverOpsServiceImpl implements OverOpsService {
             return Collections.emptySet();
         }
 
-        return Arrays.asList(value.trim().split(Pattern.quote(SEPERATOR)));
+        return Arrays.asList(value.trim().split(Pattern.quote(SEPARATOR)));
     }
 
     private void printInputs(QueryOverOps queryOverOps, PrintStream printStream, RegressionInput input) {

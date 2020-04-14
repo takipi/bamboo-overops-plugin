@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<atlassian-plugin key="${project.groupId}.${project.artifactId}"
-	name="${project.name}" plugins-version="2">
+<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
 	<plugin-info>
 		<description>${project.description}</description>
 		<version>${project.version}</version>
@@ -11,18 +10,6 @@
 
 	<!-- add default localized strings: https://developer.atlassian.com/server/framework/atlassian-sdk/internationalising-your-plugin/ -->
 	<resource type="i18n" name="overops" location="com.overops.plugins.bamboo.overops"/>
-
-	<!-- render velocity templates -->
-	<component-import name="Velocity Renderer" key="velocity-renderer"
-		interface="com.atlassian.templaterenderer.TemplateRenderer" />
-
-	<!-- store and retrieve plugin settings -->
-	<component-import name="Plugin Settings Factory" key="plugin-settings-factory"
-		interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" />
-
-	<!-- execute transactions -->
-	<component-import name="Transaction Template" key="transaction-template"
-		interface="com.atlassian.sal.api.transaction.TransactionTemplate" />
 
 	<!-- admin settings page servlet -->
 	<servlet name="Administration settings" key="overops-admin-servlet"

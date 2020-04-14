@@ -185,9 +185,10 @@ public class TaskConfiguration extends AbstractTaskConfigurator implements Build
 
     // only validate a field if the quality gate is enabled
     private void conditional(String key, String conditionalKey, Consumer<String> validFunction) {
+
         // checkbox states are "true" and null
         if (!StringUtils.isBlank(this.params.getString(conditionalKey))) {
-            this.params.replace(conditionalKey, "true"); // re-check the conditional's checkbox
+            this.params.replace(conditionalKey, "true"); // re-check the conditional's checkbox (creates logged warnings)
             validFunction.accept(key);
         }
     }

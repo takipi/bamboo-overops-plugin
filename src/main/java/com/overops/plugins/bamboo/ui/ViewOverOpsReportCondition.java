@@ -12,6 +12,8 @@ import com.atlassian.bamboo.resultsummary.BuildResultsSummaryImpl;
 import com.atlassian.bamboo.resultsummary.ResultsSummary;
 import com.atlassian.bamboo.resultsummary.ResultsSummaryManager;
 import com.atlassian.plugin.PluginParseException;
+import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugin.web.Condition;
 import org.apache.log4j.Logger;
 
@@ -19,10 +21,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Scanned
 public class ViewOverOpsReportCondition implements Condition {
     private static final Logger log = Logger.getLogger(ViewOverOpsReportCondition.class);
 
+    @ComponentImport
     private PlanManager planManager;
+
+    @ComponentImport
     private ResultsSummaryManager resultsSummaryManager;
 
     public ViewOverOpsReportCondition(PlanManager planManager, ResultsSummaryManager resultsSummaryManager) {

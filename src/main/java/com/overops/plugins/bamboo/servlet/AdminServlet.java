@@ -11,9 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.atlassian.templaterenderer.TemplateRenderer;
+import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
-import com.atlassian.sal.api.transaction.TransactionTemplate;
 
 import com.takipi.api.client.ApiClient;
 import com.takipi.api.client.RemoteApiClient;
@@ -24,6 +25,7 @@ import com.overops.plugins.bamboo.configuration.Const;
 
 import org.apache.commons.lang3.StringUtils;
 
+@Scanned
 public class AdminServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -51,11 +53,13 @@ public class AdminServlet extends HttpServlet {
 
     }
 
+    @ComponentImport
     private final PluginSettingsFactory pluginSettingsFactory;
+
+    @ComponentImport
     private final TemplateRenderer renderer;
 
-    public AdminServlet(PluginSettingsFactory pluginSettingsFactory, TemplateRenderer renderer,
-            TransactionTemplate transactionTemplate) {
+    public AdminServlet(PluginSettingsFactory pluginSettingsFactory, TemplateRenderer renderer) {
         this.pluginSettingsFactory = pluginSettingsFactory;
         this.renderer = renderer;
     }

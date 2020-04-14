@@ -1,5 +1,7 @@
 package com.overops.plugins.bamboo;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,6 +11,8 @@ import com.atlassian.bamboo.task.TaskContext;
 import com.atlassian.bamboo.task.TaskException;
 import com.atlassian.bamboo.task.TaskResult;
 import com.atlassian.bamboo.task.TaskResultBuilder;
+import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.overops.plugins.bamboo.configuration.Const;
@@ -21,16 +25,17 @@ import com.overops.plugins.bamboo.utils.ReportUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.jetbrains.annotations.NotNull;
-import org.springframework.stereotype.Component;
 
-@Component
+@Scanned
 public class TaskType implements com.atlassian.bamboo.task.TaskType {
+
+    @ComponentImport
+    private PluginSettingsFactory pluginSettingsFactory;
 
     private OverOpsService overOpsService;
     private ObjectMapper objectMapper;
-    private PluginSettingsFactory pluginSettingsFactory;
 
-    public TaskType(final ProcessService processService, PluginSettingsFactory pluginSettingsFactory) {
+    public TaskType(PluginSettingsFactory pluginSettingsFactory) {
         this.overOpsService = new OverOpsServiceImpl();
         this.objectMapper = new ObjectMapper();
         this.pluginSettingsFactory = pluginSettingsFactory;
@@ -42,7 +47,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
 
         final BuildLogger logger = context.getBuildLogger();
 
-        logger.addBuildLogEntry("Generating OverOps Quality Report [" + Utils.getVersion() + "]");
+        logger.addBuildLogEntry("Generating OverOps Quality Report");
 
         // get global plugin settings
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
@@ -57,6 +62,8 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         TaskResultBuilder resultBuilder = TaskResultBuilder.newBuilder(context);
 
         try {
+            logger.addBuildLogEntry("[" + Utils.getArtifactId() + " v" + Utils.getVersion() + "]");
+
             ReportBuilder.QualityReport report = overOpsService.perform(query, logger);
             OverOpsReportModel overOpsReport = ReportUtils.copyResult(report);
 
@@ -70,7 +77,14 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             }
 
         } catch (Exception e) {
-            logger.addErrorLogEntry(e.getMessage());
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+    
+            e.printStackTrace(pw);
+    
+            // stack trace as a string
+            logger.addErrorLogEntry(sw.toString());
+
             return resultBuilder.failed().build();
         }
     }

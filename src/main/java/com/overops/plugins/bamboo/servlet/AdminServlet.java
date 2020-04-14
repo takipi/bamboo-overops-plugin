@@ -1,112 +1,173 @@
 package com.overops.plugins.bamboo.servlet;
 
-import com.atlassian.sal.api.transaction.TransactionCallback;
-
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
-import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 
-import com.overops.plugins.bamboo.model.TestServiceResponse;
-import com.overops.plugins.bamboo.service.SettingService;
-import com.overops.plugins.bamboo.service.impl.SettingServiceImpl;
+import com.takipi.api.client.ApiClient;
+import com.takipi.api.client.RemoteApiClient;
+import com.takipi.api.client.util.client.ClientUtil;
+import com.takipi.api.client.data.service.SummarizedService;
+
 import com.overops.plugins.bamboo.configuration.Const;
-import org.springframework.util.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class AdminServlet extends HttpServlet {
-public static final String OVEROPS_ADMIN_VM = "overopsadmin.vm";
-    private final TransactionTemplate transactionTemplate;
-    private final PluginSettingsFactory pluginSettingsFactory;
     private static final long serialVersionUID = 1L;
-    private final String URL_REGEX = "^https://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
 
+    // velocity variables
+    private enum VM {
+        template("default-settings.vm"),
+        envId("envId"),
+        apiUrl("apiUrl"),
+        apiToken("apiToken"),
+        save("save"),
+        testConnection("testConnection"),
+        isError("isError"),
+        isSuccess("isSuccess"),
+        message("message");
+
+        private final String var;
+
+        VM(String var) {
+            this.var = var;
+        }
+
+        public String get() {
+            return var;
+        }
+
+    }
+
+    private final PluginSettingsFactory pluginSettingsFactory;
     private final TemplateRenderer renderer;
-    private SettingService settingService;
-
 
     public AdminServlet(PluginSettingsFactory pluginSettingsFactory, TemplateRenderer renderer,
-                        TransactionTemplate transactionTemplate) {
+            TransactionTemplate transactionTemplate) {
         this.pluginSettingsFactory = pluginSettingsFactory;
         this.renderer = renderer;
-        this.transactionTemplate = transactionTemplate;
-        this.settingService = new SettingServiceImpl();
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Map<String, Object> context = new HashMap<String, Object>();
-        resp.setContentType("text/html;charset=utf-8");
 
+        // get/set global plugin settings
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-        String url = Optional.ofNullable(pluginSettings.get(Const.API_URL)).map(u -> (String) u).filter(StringUtils::hasLength).map(String::trim)
-                .orElse(Const.DEFAULT_URL);
-        context.put(Const.API_URL, url.trim());
 
-        String env = Optional.ofNullable(pluginSettings.get(Const.API_ENV)).map(e -> (String) e).map(String::trim).orElse("");
+        // velocity template context
+        Map<String, Object> context = new HashMap<String, Object>();
 
-        context.put(Const.API_ENV, env);
+        // API URL: if blank, set default value
+        String globalApiUrl = (String) pluginSettings.get(Const.GLOBAL_API_URL);
+        String url = StringUtils.isBlank(globalApiUrl) ? Const.DEFAULT_API_URL : globalApiUrl;
 
-        String token = Optional.ofNullable(pluginSettings.get(Const.API_TOKEN)).map(t -> (String) t).map(String::trim).orElse("");
-        context.put(Const.API_TOKEN, token);
-        context.put(Const.ERROR, "");
-        context.put(Const.INFO, "");
-        context.put("newEventsGate", false);
-        renderer.render(OVEROPS_ADMIN_VM, context, resp.getWriter());
+        // ENV, TOKEN: blank is default value (replace null, whitespace with blank)
+        String globalEnvId = (String) pluginSettings.get(Const.GLOBAL_ENV_ID);
+        String env = StringUtils.isBlank(globalEnvId) ? "" : globalEnvId;
+
+        String globalApiToken = (String) pluginSettings.get(Const.GLOBAL_API_TOKEN);
+        String token = StringUtils.isBlank(globalApiToken) ? "" : globalApiToken;
+
+        // set velocity context
+        context.put(VM.apiUrl.get(), url);
+        context.put(VM.envId.get(), env);
+        context.put(VM.apiToken.get(), token);
+
+        // render page
+        resp.setContentType("text/html;charset=utf-8");
+        renderer.render(VM.template.get(), context, resp.getWriter());
     }
 
     @Override
     protected void doPost(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        // velocity template context
         Map<String, Object> context = new HashMap<String, Object>();
-        resp.setContentType("text/html;charset=utf-8");
 
-        String url = req.getParameter(Const.API_URL).trim().replaceAll("/+$", "");
-        String env = req.getParameter(Const.API_ENV).trim();
-        String token = req.getParameter(Const.API_TOKEN).trim();
+        // populate values from form
+        String env = req.getParameter(VM.envId.get()).trim().toUpperCase();
+        String url = req.getParameter(VM.apiUrl.get()).trim();
+        String token = req.getParameter(VM.apiToken.get()).trim();
 
-        context.put(Const.API_URL, url);
-        context.put(Const.API_ENV, env);
-        context.put(Const.API_TOKEN, token);
+        // check if 'save' or 'test connection' was submitted
+        boolean isSave = StringUtils.isNotBlank(req.getParameter(VM.save.get()));
+        boolean isTestConnection = StringUtils.isNotBlank(req.getParameter(VM.testConnection.get()));
 
-        if (!url.matches(URL_REGEX)) {
-            context.put(Const.ERROR, "OverOps url is not saved! Invalid format!");
-            context.put(Const.INFO, "");
+        if (isSave) {
 
-            renderer.render(OVEROPS_ADMIN_VM, context, resp.getWriter());
-            return;
+            // save form
+            PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
+            pluginSettings.put(Const.GLOBAL_ENV_ID, env);
+            pluginSettings.put(Const.GLOBAL_API_URL, url);
+            pluginSettings.put(Const.GLOBAL_API_TOKEN, token);
+
+            context.put(VM.isSuccess.get(), "true");
+            context.put(VM.message.get(), "Settings saved");
+
+        } else if (isTestConnection) {
+
+            // test credentials
+            RemoteApiClient apiClient =
+                (RemoteApiClient) RemoteApiClient.newBuilder()
+                .setHostname(url)
+                .setApiKey(token)
+                .build();
+
+            if (!apiClient.validateConnection()) {
+                // error - can't connect to host
+                context.put(VM.isError.get(), "true");
+                context.put(VM.message.get(), "Unable to connect. Check API URL.");
+            } else if (!hasAccessToEnvironment(apiClient, env)) {
+                // error - no access to env
+                context.put(VM.isError.get(), "true");
+                context.put(VM.message.get(), "Permission denied. Check Environment ID and API Token.");
+            } else {
+                // success
+                context.put(VM.isSuccess.get(), "true");
+                context.put(VM.message.get(), "Connection successful. Click 'save' to save settings.");
+            }
         }
+
+        // set velocity context
+        context.put(VM.apiUrl.get(), url);
+        context.put(VM.envId.get(), env);
+        context.put(VM.apiToken.get(), token);
+
+        // render template
+        resp.setContentType("text/html;charset=utf-8");
+        renderer.render(VM.template.get(), context, resp.getWriter());
+    }
+
+    private static boolean hasAccessToEnvironment(ApiClient apiClient, String envId) {
+
+        List<SummarizedService> environments;
 
         try {
-            TestServiceResponse response = settingService.testConnection(url, env, token);
-
-            if (response.isStatus()) {
-                transactionTemplate.execute((TransactionCallback) () -> {
-                    PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-                    pluginSettings.put(Const.API_URL, url);
-                    pluginSettings.put(Const.API_ENV, env);
-                    pluginSettings.put(Const.API_TOKEN, token);
-                    return pluginSettings;
-                });
-                context.put(Const.INFO, "OverOps settings are updated. Check that jobs are configured properly");
-                context.put(Const.ERROR, "");
-            } else {
-                context.put(Const.ERROR, response.getMessage());
-                context.put(Const.INFO, "");
-            }
+            environments = ClientUtil.getEnvironments(apiClient);
         } catch (Exception e) {
-            context.put(Const.ERROR, "OverOps settings were not saved! Check server url, environment id or token.");
-            context.put(Const.INFO, "");
-        } finally {
-            renderer.render(OVEROPS_ADMIN_VM, context, resp.getWriter());
+            return false;
         }
+
+        for (SummarizedService env : environments) {
+            if (env.id.equals(envId)) {
+                return true;
+            }
+        }
+
+        return false;
+
     }
+
 }

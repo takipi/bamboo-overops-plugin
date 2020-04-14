@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <title>OverOps settings</title>
+    <meta name="decorator" content="atl.admin">
+  </head>
+  <body>
+    <h1>OverOps settings</h1>
+
+    <form id="overopsSettingsForm" name="overopsSettingsForm" action="" method="post" class="aui">
+      <div class="form-content-container">
+        <div class="field-group">
+          <label for="name">API URL</label>
+          <input type="text" id="apiUrl" name="apiUrl" class="text" value="${apiUrl}">
+          <div class="description">
+            The complete url including protocol and port of the OverOps API (e.g. https://api.overops.com or http://host.domain.com:8080)
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="name">API Token</label>
+          <input type="password" id="apiToken" name="apiToken" class="text" value="${apiToken}">
+          <div class="description">
+            The OverOps REST API token to use for authentication. This can be obtained from the OverOps dashboard under Settings &rarr; Account.
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="name">Environment ID</label>
+          <input type="text" id="envId" name="envId" class="text" value="${envId}">
+          <div class="description">
+            The OverOps default environment identifier (e.g. S12345)
+          </div>
+        </div>
+
+        <div class="buttons-container">
+          <div class="buttons">
+            <input type="submit" name="save" value="Save" class="assistive" id="overopsSettingsForm_defaultSave" tabindex="-1">
+            <input type="submit" name="save" value="Save" class="aui-button aui-button-primary" id="overopsSettingsForm_save" accessKey="S">
+            <input type="submit" name="testConnection" value="Test Connection" class="aui-button" id="overopsSettingsForm_test" accessKey="T">
+          </div>
+        </div>
+
+          #if ($isSuccess)
+            #set ($messageClass = "success")
+            #set ($messageIcon  = "aui-iconfont-successful-build")
+          #elseif ($isError)
+            #set ($messageClass = "error")
+            #set ($messageIcon = "aui-iconfont-failed-build")
+          #end
+
+          #if ($isSuccess || $isError)
+          <div class="field-group aui-message $messageClass" style="margin-top:10px">
+            <span class='aui-icon aui-icon-small $messageIcon'></span> $!message
+          </div>
+          #end
+
+      </div>
+    </form>
+  </body>
+</html>

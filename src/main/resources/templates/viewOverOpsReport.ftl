@@ -155,7 +155,7 @@
                             <td>Introduced by</td>
                             <td>Volume</td>
                         </tr>
-                        [#foreach k in report.resurfacedEvents]
+                        [#foreach k in report.topEvents]
                             <tr>
                                 <td><a href="${k.arcLink}" target="_blank"> ${k.eventSummary}</a></td>
                                 <td>${k.applications}</td>

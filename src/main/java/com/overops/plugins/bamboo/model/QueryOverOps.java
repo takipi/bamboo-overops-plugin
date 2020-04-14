@@ -1,60 +1,61 @@
 package com.overops.plugins.bamboo.model;
 
-import com.atlassian.bamboo.configuration.ConfigurationMap;
-import org.springframework.util.StringUtils;
+import java.util.Map;
 
-import java.util.Optional;
+import com.atlassian.bamboo.configuration.ConfigurationMap;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import static com.overops.plugins.bamboo.configuration.Const.*;
 
 public class QueryOverOps {
-    private String overOpsURL;
-    private String overOpsSID;
-    private String overOpsAPIKey;
+    private String apiUrl;
+    private String envId;
+    private String apiToken;
 
     private String applicationName;
     private String deploymentName;
-    private String serviceId;
     private String regexFilter;
-    private boolean markUnstable = false;
-    private Integer printTopIssues = 5;
-    private boolean newEvents = false;
-    private boolean resurfacedErrors = false;
-    private Integer maxErrorVolume = 0;
-    private Integer maxUniqueErrors = 0;
+    private boolean markUnstable;
+    private Integer topErrorCount;
+
+    private boolean newEvents;
+    private boolean resurfacedErrors;
+    private Integer maxErrorVolume;
+    private Integer maxUniqueErrors;
     private String criticalExceptionTypes;
-    private String activeTimespan = "0";
-    private String baselineTimespan = "0";
-    private Integer minVolumeThreshold = 0;
-    private Double minErrorRateThreshold = 0d;
-    private Double regressionDelta = 0d;
-    private Double criticalRegressionDelta = 0d;
-    private boolean applySeasonality = false;
+    private String activeTimespan;
+    private String baselineTimespan;
+    private Integer minVolumeThreshold;
+    private Double minRateThreshold;
+    private Double regressionDelta;
+    private Double criticalRegressionThreshold;
+    private boolean applySeasonality;
 
-    private boolean debug = false;
+    private boolean debug;
 
-    public String getOverOpsURL() {
-        return overOpsURL;
+    public String getApiUrl() {
+        return apiUrl;
     }
 
-    public void setOverOpsURL(String overOpsURL) {
-        this.overOpsURL = overOpsURL;
+    public void setApiUrl(String apiUrl) {
+        this.apiUrl = apiUrl;
     }
 
-    public String getOverOpsSID() {
-        return overOpsSID;
+    public String getEnvId() {
+        return envId;
     }
 
-    public void setOverOpsSID(String overOpsSID) {
-        this.overOpsSID = overOpsSID;
+    public void setEnvId(String envId) {
+        this.envId = envId.toUpperCase(); // must be S12345, not s12345
     }
 
-    public String getOverOpsAPIKey() {
-        return overOpsAPIKey;
+    public String getApiToken() {
+        return apiToken;
     }
 
-    public void setOverOpsAPIKey(String overOpsAPIKey) {
-        this.overOpsAPIKey = overOpsAPIKey;
+    public void setApiToken(String apiToken) {
+        this.apiToken = apiToken;
     }
 
     public String getApplicationName() {
@@ -73,14 +74,6 @@ public class QueryOverOps {
         this.deploymentName = deploymentName;
     }
 
-    public String getServiceId() {
-        return serviceId;
-    }
-
-    public void setServiceId(String serviceId) {
-        this.serviceId = serviceId;
-    }
-
     public String getRegexFilter() {
         return regexFilter;
     }
@@ -97,12 +90,12 @@ public class QueryOverOps {
         this.markUnstable = markUnstable;
     }
 
-    public Integer getPrintTopIssues() {
-        return printTopIssues;
+    public Integer getTopErrorCount() {
+        return topErrorCount;
     }
 
-    public void setPrintTopIssues(Integer printTopIssues) {
-        this.printTopIssues = printTopIssues;
+    public void setTopErrorCount(Integer topErrorCount) {
+        this.topErrorCount = topErrorCount;
     }
 
     public boolean isNewEvents() {
@@ -169,12 +162,12 @@ public class QueryOverOps {
         this.minVolumeThreshold = minVolumeThreshold;
     }
 
-    public Double getMinErrorRateThreshold() {
-        return minErrorRateThreshold;
+    public Double getMinRateThreshold() {
+        return minRateThreshold;
     }
 
-    public void setMinErrorRateThreshold(Double minErrorRateThreshold) {
-        this.minErrorRateThreshold = minErrorRateThreshold;
+    public void setMinRateThreshold(Double minRateThreshold) {
+        this.minRateThreshold = minRateThreshold;
     }
 
     public Double getRegressionDelta() {
@@ -185,12 +178,12 @@ public class QueryOverOps {
         this.regressionDelta = regressionDelta;
     }
 
-    public Double getCriticalRegressionDelta() {
-        return criticalRegressionDelta;
+    public Double getCriticalRegressionThreshold() {
+        return criticalRegressionThreshold;
     }
 
-    public void setCriticalRegressionDelta(Double criticalRegressionDelta) {
-        this.criticalRegressionDelta = criticalRegressionDelta;
+    public void setCriticalRegressionThreshold(Double criticalRegressionThreshold) {
+        this.criticalRegressionThreshold = criticalRegressionThreshold;
     }
 
     public boolean isApplySeasonality() {
@@ -209,46 +202,55 @@ public class QueryOverOps {
         this.debug = debug;
     }
 
-    public static QueryOverOps mapToObject(ConfigurationMap params) {
+    public static QueryOverOps mapToObject(ConfigurationMap params, Map<String, String> globalSettings) {
+
         QueryOverOps queryOverOps = new QueryOverOps();
-        queryOverOps.overOpsURL = params.get(API_URL);
-        queryOverOps.overOpsSID = params.get(API_ENV);
-        queryOverOps.overOpsAPIKey = params.get(API_TOKEN);
+
+        // api info always comes from global settings page
+        queryOverOps.apiUrl = globalSettings.get(GLOBAL_API_URL);
+        queryOverOps.apiToken = globalSettings.get(GLOBAL_API_TOKEN);
+
+        // use default env ID from global settings page if missing in the task settings
+        queryOverOps.envId = (StringUtils.isBlank(params.get(ENV_ID)) ? globalSettings.get(GLOBAL_ENV_ID) : params.get(ENV_ID));
+
         queryOverOps.applicationName = params.get(APP_NAME);
         queryOverOps.deploymentName = params.get(DEP_NAME);
 
-        queryOverOps.serviceId = Optional.ofNullable(params.get(SERVICE_ID)).filter(StringUtils::hasText).orElse(queryOverOps.overOpsSID);
-        queryOverOps.regexFilter = Optional.ofNullable(params.get(REGEX_FILTER)).filter(StringUtils::hasText).orElse("");
-        queryOverOps.markUnstable = Boolean.parseBoolean(Optional.ofNullable(params.get(MARK_UNSTABLE)).filter(StringUtils::hasText).orElse("false"));
-        queryOverOps.printTopIssues = Integer.parseInt(Optional.ofNullable(params.get(TOP_ISSUE)).filter(StringUtils::hasText).orElse("5"));
-        queryOverOps.newEvents = Boolean.parseBoolean(Optional.ofNullable(params.get(NEW_EVENTS)).filter(StringUtils::hasText).orElse("false"));
-        queryOverOps.resurfacedErrors = Boolean.parseBoolean(Optional.ofNullable(params.get(SURFACED_ERROR)).filter(StringUtils::hasText).orElse("false"));
-        queryOverOps.maxErrorVolume = Integer.parseInt(Optional.ofNullable(params.get(NEW_ERROR_VOLUME)).filter(StringUtils::hasText).orElse("0"));
-        queryOverOps.maxUniqueErrors = Integer.parseInt(Optional.ofNullable(params.get(MAX_UNIQUE_ERROR)).filter(StringUtils::hasText).orElse("0"));
-        queryOverOps.criticalExceptionTypes = params.getOrDefault(CRITICAL_EXCEPTION_TYPE, "");
-        queryOverOps.activeTimespan = Optional.ofNullable(params.get(ACTIVE_TIMESPAN)).filter(StringUtils::hasText).orElse("0");
-        queryOverOps.baselineTimespan = Optional.ofNullable(params.get(BASELINE_TIMESPAN)).filter(StringUtils::hasText).orElse("0");
-        queryOverOps.minVolumeThreshold = Integer.parseInt(Optional.ofNullable(params.get(MIN_VOLUME_THRESHOLD)).filter(StringUtils::hasText).orElse("0"));
-        queryOverOps.minErrorRateThreshold = Double.parseDouble(Optional.ofNullable(params.get(MIN_ERROR_RATE_THRESHOLD)).filter(StringUtils::hasText).orElse("0"));
-        queryOverOps.regressionDelta = Double.parseDouble(Optional.ofNullable(params.get(REGRESSION_DELTA)).filter(StringUtils::hasText).orElse("0"));
-        queryOverOps.criticalRegressionDelta = Double.parseDouble(Optional.ofNullable(params.get(CRITICAL_REGRESSION_DELTA)).filter(StringUtils::hasText).orElse("0"));
-        queryOverOps.applySeasonality = Boolean.parseBoolean(Optional.ofNullable(params.get(APPLY_SEASONALITY)).filter(StringUtils::hasText).orElse("false"));
-        queryOverOps.debug = Boolean.parseBoolean(Optional.ofNullable(params.get(DEBUG)).filter(StringUtils::hasText).orElse("false"));
+        queryOverOps.regexFilter = params.get(REGEX_FILTER);
+        queryOverOps.markUnstable = Boolean.parseBoolean(params.get(MARK_UNSTABLE));
+        queryOverOps.topErrorCount = NumberUtils.toInt(params.get(TOP_ERROR_COUNT), 0);
+
+        queryOverOps.newEvents = Boolean.parseBoolean(params.get(CHECK_NEW_ERRORS));
+        queryOverOps.resurfacedErrors = Boolean.parseBoolean(params.get(CHECK_RESURFACED_ERRORS));
+
+        queryOverOps.maxErrorVolume = NumberUtils.toInt(params.get(MAX_ERROR_VOLUME), 0);
+        queryOverOps.maxUniqueErrors = NumberUtils.toInt(params.get(MAX_UNIQUE_ERRORS), 0);
+
+        queryOverOps.criticalExceptionTypes = params.getOrDefault(CRITICAL_EXCEPTION_TYPES, "");
+
+        queryOverOps.activeTimespan = params.get(ACTIVE_TIMESPAN);
+        queryOverOps.baselineTimespan = params.get(BASELINE_TIMESPAN);
+        queryOverOps.minVolumeThreshold = NumberUtils.toInt(params.get(MIN_VOLUME_THRESHOLD), 0);
+        queryOverOps.minRateThreshold = NumberUtils.toDouble(params.get(MIN_RATE_THRESHOLD), 0);
+        queryOverOps.regressionDelta = NumberUtils.toDouble(params.get(REGRESSION_DELTA), 0);
+        queryOverOps.criticalRegressionThreshold = NumberUtils.toDouble(params.get(CRITICAL_REGRESSION_THRESHOLD), 0);
+        queryOverOps.applySeasonality = Boolean.parseBoolean(params.get(APPLY_SEASONALITY));
+
+        queryOverOps.debug = Boolean.parseBoolean(params.get(DEBUG));
         return queryOverOps;
     }
 
     @Override
     public String toString() {
         return "QueryOverOps{" +
-                "overOpsURL='" + overOpsURL + '\'' +
-                ", overOpsSID='" + overOpsSID + '\'' +
-                ", overOpsAPIKey='" + overOpsAPIKey + '\'' +
+                "apiUrl='" + apiUrl + '\'' +
+                ", envId='" + envId + '\'' +
+                ", apiToken='" + apiToken + '\'' +
                 ", applicationName='" + applicationName + '\'' +
                 ", deploymentName='" + deploymentName + '\'' +
-                ", serviceId='" + serviceId + '\'' +
                 ", regexFilter='" + regexFilter + '\'' +
                 ", markUnstable=" + markUnstable +
-                ", printTopIssues=" + printTopIssues +
+                ", topErrorCount=" + topErrorCount +
                 ", newEvents=" + newEvents +
                 ", resurfacedErrors=" + resurfacedErrors +
                 ", maxErrorVolume=" + maxErrorVolume +
@@ -257,9 +259,9 @@ public class QueryOverOps {
                 ", activeTimespan='" + activeTimespan + '\'' +
                 ", baselineTimespan='" + baselineTimespan + '\'' +
                 ", minVolumeThreshold=" + minVolumeThreshold +
-                ", minErrorRateThreshold=" + minErrorRateThreshold +
+                ", minRateThreshold=" + minRateThreshold +
                 ", regressionDelta=" + regressionDelta +
-                ", criticalRegressionDelta=" + criticalRegressionDelta +
+                ", criticalRegressionThreshold=" + criticalRegressionThreshold +
                 ", applySeasonality=" + applySeasonality +
                 ", debug=" + debug +
                 '}';

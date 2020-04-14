@@ -1,11 +1,17 @@
 package com.overops.plugins.bamboo;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.process.ProcessService;
 import com.atlassian.bamboo.task.TaskContext;
 import com.atlassian.bamboo.task.TaskException;
 import com.atlassian.bamboo.task.TaskResult;
 import com.atlassian.bamboo.task.TaskResultBuilder;
+import com.atlassian.sal.api.pluginsettings.PluginSettings;
+import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
+import com.overops.plugins.bamboo.configuration.Const;
 import com.overops.plugins.bamboo.model.OverOpsReportModel;
 import com.overops.plugins.bamboo.model.QueryOverOps;
 import com.overops.plugins.bamboo.service.OverOpsService;
@@ -13,42 +19,56 @@ import com.overops.plugins.bamboo.service.impl.OverOpsServiceImpl;
 import com.overops.plugins.bamboo.service.impl.ReportBuilder;
 import com.overops.plugins.bamboo.utils.ReportUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 @Component
 public class TaskType implements com.atlassian.bamboo.task.TaskType {
 
-    private ProcessService processService;
     private OverOpsService overOpsService;
     private ObjectMapper objectMapper;
+    private PluginSettingsFactory pluginSettingsFactory;
 
-    public TaskType(final ProcessService processService) {
-        this.processService = processService;
+    public TaskType(final ProcessService processService, PluginSettingsFactory pluginSettingsFactory) {
         this.overOpsService = new OverOpsServiceImpl();
         this.objectMapper = new ObjectMapper();
+        this.pluginSettingsFactory = pluginSettingsFactory;
     }
 
     @NotNull
     @Override
     public TaskResult execute(@NotNull TaskContext context) throws TaskException {
-        TaskResultBuilder resultBuilder = TaskResultBuilder.newBuilder(context);
+
         final BuildLogger logger = context.getBuildLogger();
-        logger.addBuildLogEntry("Executing OverOps task...");
-        logger.addBuildLogEntry("OverOpsBamboo plugin v." + Utils.getVersion());
-        QueryOverOps query = QueryOverOps.mapToObject(context.getConfigurationMap());
+
+        logger.addBuildLogEntry("Generating OverOps Quality Report [" + Utils.getVersion() + "]");
+
+        // get global plugin settings
+        PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
+
+        Map<String, String> globalSettings = new HashMap<>(3);
+        globalSettings.put(Const.GLOBAL_API_URL, (String) pluginSettings.get(Const.GLOBAL_API_URL));
+        globalSettings.put(Const.GLOBAL_API_TOKEN, (String) pluginSettings.get(Const.GLOBAL_API_TOKEN));
+        globalSettings.put(Const.GLOBAL_ENV_ID, (String) pluginSettings.get(Const.GLOBAL_ENV_ID));
+
+        QueryOverOps query = QueryOverOps.mapToObject(context.getConfigurationMap(), globalSettings);
+
+        TaskResultBuilder resultBuilder = TaskResultBuilder.newBuilder(context);
+
         try {
             ReportBuilder.QualityReport report = overOpsService.perform(query, logger);
             OverOpsReportModel overOpsReport = ReportUtils.copyResult(report);
+
             context.getBuildContext().getBuildResult().getCustomBuildData().put("overOpsReport", objectMapper.writeValueAsString(overOpsReport));
             context.getBuildContext().getBuildResult().getCustomBuildData().put("isOverOpsStep", "true");
+
             if (overOpsReport.isMarkedUnstable() && overOpsReport.isUnstable()) {
                 return resultBuilder.failed().build();
             } else {
                 return resultBuilder.success().build();
             }
+
         } catch (Exception e) {
             logger.addErrorLogEntry(e.getMessage());
             return resultBuilder.failed().build();

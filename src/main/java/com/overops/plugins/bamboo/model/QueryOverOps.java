@@ -1,8 +1,10 @@
 package com.overops.plugins.bamboo.model;
 
 import java.util.Map;
+
 import com.atlassian.bamboo.configuration.ConfigurationMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import static com.overops.plugins.bamboo.configuration.Const.*;
 
@@ -216,22 +218,22 @@ public class QueryOverOps {
 
         queryOverOps.regexFilter = params.get(REGEX_FILTER);
         queryOverOps.markUnstable = Boolean.parseBoolean(params.get(MARK_UNSTABLE));
-        queryOverOps.topErrorCount = Integer.parseInt(params.getOrDefault(TOP_ERROR_COUNT, "0"));
+        queryOverOps.topErrorCount = NumberUtils.toInt(params.get(TOP_ERROR_COUNT), 0);
 
         queryOverOps.newEvents = Boolean.parseBoolean(params.get(CHECK_NEW_ERRORS));
         queryOverOps.resurfacedErrors = Boolean.parseBoolean(params.get(CHECK_RESURFACED_ERRORS));
 
-        queryOverOps.maxErrorVolume = Integer.parseInt(params.getOrDefault(MAX_ERROR_VOLUME, "0"));
-        queryOverOps.maxUniqueErrors = Integer.parseInt(params.getOrDefault(MAX_UNIQUE_ERRORS, "0"));
+        queryOverOps.maxErrorVolume = NumberUtils.toInt(params.get(MAX_ERROR_VOLUME), 0);
+        queryOverOps.maxUniqueErrors = NumberUtils.toInt(params.get(MAX_UNIQUE_ERRORS), 0);
 
         queryOverOps.criticalExceptionTypes = params.getOrDefault(CRITICAL_EXCEPTION_TYPES, "");
 
         queryOverOps.activeTimespan = params.get(ACTIVE_TIMESPAN);
         queryOverOps.baselineTimespan = params.get(BASELINE_TIMESPAN);
-        queryOverOps.minVolumeThreshold = Integer.parseInt(params.getOrDefault(MIN_VOLUME_THRESHOLD, "0"));
-        queryOverOps.minRateThreshold = Double.parseDouble(params.getOrDefault(MIN_RATE_THRESHOLD, "0"));
-        queryOverOps.regressionDelta = Double.parseDouble(params.getOrDefault(REGRESSION_DELTA, "0"));
-        queryOverOps.criticalRegressionThreshold = Double.parseDouble(params.getOrDefault(CRITICAL_REGRESSION_THRESHOLD, "0"));
+        queryOverOps.minVolumeThreshold = NumberUtils.toInt(params.get(MIN_VOLUME_THRESHOLD), 0);
+        queryOverOps.minRateThreshold = NumberUtils.toDouble(params.get(MIN_RATE_THRESHOLD), 0);
+        queryOverOps.regressionDelta = NumberUtils.toDouble(params.get(REGRESSION_DELTA), 0);
+        queryOverOps.criticalRegressionThreshold = NumberUtils.toDouble(params.get(CRITICAL_REGRESSION_THRESHOLD), 0);
         queryOverOps.applySeasonality = Boolean.parseBoolean(params.get(APPLY_SEASONALITY));
 
         queryOverOps.debug = Boolean.parseBoolean(params.get(DEBUG));

@@ -8,7 +8,7 @@ For more information about this app and [quality gates](https://doc.overops.com/
 
 ## Installation
 
-Navigate to Bamboo Administration &rarr; Manage apps. Click "Find New Apps" and search for "OverOps" to install the app from the Atlassian Marketplace. Alternatively, you may download the [latest release](/releases) and click "Upload app" to install the app directly.
+Navigate to Bamboo Administration &rarr; Manage apps. Click "Find New Apps" and search for "OverOps" to install the app from the Atlassian Marketplace. Alternatively, you may download the [latest release](https://github.com/takipi/bamboo-overops-plugin/releases) and click "Upload app" to install the app directly.
 
 ## Global Configuration
 
@@ -28,7 +28,7 @@ The OverOps REST API token to use for authentication. [This can be obtained from
 
 ### Environment ID
 
-The default OverOps environment identifier (e.g. S12345) if none is specified in the task settings.
+The default OverOps environment identifier (e.g. S12345) if none is specified in the Quality Report configuration for your project.
 
 #### Testing
 
@@ -44,7 +44,7 @@ Navigate to Plan Configuration &rarr; Tasks for your Bamboo project. Click "Add 
 
 #### Environment ID
 
-The OverOps environment identifier (e.g S4567) If no value is provided here, the value provided in the global settings will be used.
+The OverOps environment identifier (e.g S4567) If no value is provided here, the default value provided in the global configuration will be used.
 
 #### Application Name
 
@@ -110,11 +110,11 @@ The time window against which events in the active window are compared to test f
 
 **Example:** `7d`
 
-##### Event Volume Threshold
+##### Error Volume Threshold
 
 The minimum number of times an event must take place to fail the quality gate.
 
-##### Event Rate Threshold (0-1)
+##### Error Rate Threshold (0-1)
 
 The minimum rate at which event must take place to fail the quality gate. A rate of 0.1 means the events is allowed to take place <= 10% of the time.
 
@@ -133,6 +133,10 @@ If peaks have been seen in baseline window, then this would be considered normal
 #### Debug
 
 If checked, all queries and results will be logged. *For debugging purposes only.*
+
+## Troubleshooting
+
+For short-lived applications, [we recommend](https://support.overops.com/hc/en-us/articles/360041054474-Best-Practice-Short-lived-application-considerations) using the ```-Dtakipi.shutdown.gracetime=20000``` agent property.
 
 ## Building from source
 
@@ -158,6 +162,10 @@ OS name: "mac os x", version: "10.14.6", arch: "x86_64", family: "mac"
 ### Build the app
 
 After cloning this project, build the app with `atlas-mvn clean package`. The resulting `jar` and `obr` files can be found in the `target/` directory.
+
+Deploy the app by uploading the `jar` or `obr` on the Bamboo Administration Manage apps page.
+
+Debug logs can be found in `/var/atlassian/application-data/bamboo/logs/atlassian-bamboo.log`
 
 ### Developer documentation
 

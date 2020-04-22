@@ -122,25 +122,40 @@ public class AdminServlet extends HttpServlet {
 
         } else if (isTestConnection) {
 
-            // test credentials
-            RemoteApiClient apiClient =
-                (RemoteApiClient) RemoteApiClient.newBuilder()
-                .setHostname(url)
-                .setApiKey(token)
-                .build();
+            if (StringUtils.isBlank(url)) {
 
-            if (!apiClient.validateConnection()) {
-                // error - can't connect to host
+                // URL can't be blank
                 context.put(VM.isError.get(), "true");
-                context.put(VM.message.get(), "Unable to connect. Check API URL.");
-            } else if (!hasAccessToEnvironment(apiClient, env)) {
-                // error - no access to env
+                context.put(VM.message.get(), "Unable to connect. API URL cannot be blank.");
+
+            } else if (StringUtils.isBlank(token)) {
+
+                // API Token can't be blank
                 context.put(VM.isError.get(), "true");
-                context.put(VM.message.get(), "Permission denied. Check Environment ID and API Token.");
+                context.put(VM.message.get(), "Unable to connect. API Token cannot be blank.");
+
             } else {
-                // success
-                context.put(VM.isSuccess.get(), "true");
-                context.put(VM.message.get(), "Connection successful. Click 'save' to save settings.");
+
+                // test credentials
+                RemoteApiClient apiClient =
+                    (RemoteApiClient) RemoteApiClient.newBuilder()
+                    .setHostname(url)
+                    .setApiKey(token)
+                    .build();
+
+                if (!apiClient.validateConnection()) {
+                    // error - can't connect to host
+                    context.put(VM.isError.get(), "true");
+                    context.put(VM.message.get(), "Unable to connect. Check API URL.");
+                } else if (!hasAccessToEnvironment(apiClient, env)) {
+                    // error - no access to env
+                    context.put(VM.isError.get(), "true");
+                    context.put(VM.message.get(), "Permission denied. Check Environment ID and API Token.");
+                } else {
+                    // success
+                    context.put(VM.isSuccess.get(), "true");
+                    context.put(VM.message.get(), "Connection successful. Click 'save' to save settings.");
+                }
             }
         }
 

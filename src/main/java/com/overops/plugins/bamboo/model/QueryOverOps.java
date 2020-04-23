@@ -202,44 +202,6 @@ public class QueryOverOps {
         this.debug = debug;
     }
 
-    public static QueryOverOps mapToObject(ConfigurationMap params, Map<String, String> globalSettings) {
-
-        QueryOverOps queryOverOps = new QueryOverOps();
-
-        // api info always comes from global settings page
-        queryOverOps.apiUrl = globalSettings.get(GLOBAL_API_URL);
-        queryOverOps.apiToken = globalSettings.get(GLOBAL_API_TOKEN);
-
-        // use default env ID from global settings page if missing in the task settings
-        queryOverOps.envId = (StringUtils.isBlank(params.get(ENV_ID)) ? globalSettings.get(GLOBAL_ENV_ID) : params.get(ENV_ID));
-
-        queryOverOps.applicationName = params.get(APP_NAME);
-        queryOverOps.deploymentName = params.get(DEP_NAME);
-
-        queryOverOps.regexFilter = params.get(REGEX_FILTER);
-        queryOverOps.markUnstable = Boolean.parseBoolean(params.get(MARK_UNSTABLE));
-        queryOverOps.topErrorCount = NumberUtils.toInt(params.get(TOP_ERROR_COUNT), 0);
-
-        queryOverOps.newEvents = Boolean.parseBoolean(params.get(CHECK_NEW_ERRORS));
-        queryOverOps.resurfacedErrors = Boolean.parseBoolean(params.get(CHECK_RESURFACED_ERRORS));
-
-        queryOverOps.maxErrorVolume = NumberUtils.toInt(params.get(MAX_ERROR_VOLUME), 0);
-        queryOverOps.maxUniqueErrors = NumberUtils.toInt(params.get(MAX_UNIQUE_ERRORS), 0);
-
-        queryOverOps.criticalExceptionTypes = params.getOrDefault(CRITICAL_EXCEPTION_TYPES, "");
-
-        queryOverOps.activeTimespan = params.get(ACTIVE_TIMESPAN);
-        queryOverOps.baselineTimespan = params.get(BASELINE_TIMESPAN);
-        queryOverOps.minVolumeThreshold = NumberUtils.toInt(params.get(MIN_VOLUME_THRESHOLD), 0);
-        queryOverOps.minRateThreshold = NumberUtils.toDouble(params.get(MIN_RATE_THRESHOLD), 0);
-        queryOverOps.regressionDelta = NumberUtils.toDouble(params.get(REGRESSION_DELTA), 0);
-        queryOverOps.criticalRegressionThreshold = NumberUtils.toDouble(params.get(CRITICAL_REGRESSION_THRESHOLD), 0);
-        queryOverOps.applySeasonality = Boolean.parseBoolean(params.get(APPLY_SEASONALITY));
-
-        queryOverOps.debug = Boolean.parseBoolean(params.get(DEBUG));
-        return queryOverOps;
-    }
-
     @Override
     public String toString() {
         return "QueryOverOps{" +

@@ -43,8 +43,8 @@
 
 <h3>General settings</h3>
 [@ww.textfield labelKey="com.overops.plugins.bamboo.task.config.envId" name="envId" required="false" description="The OverOps environment identifier (e.g S12345). If blank, the <a href=\"/plugins/servlet/overops/admin\">default value</a> is used."/]
-[@ww.textfield labelKey="com.overops.plugins.bamboo.task.config.applicationName" name="applicationName" required="false" description="<em>(Optional)</em> Application Name as specified in OverOps."/]
-[@ww.textfield labelKey="com.overops.plugins.bamboo.task.config.deploymentName" name="deploymentName" required="false" description="<em>(Optional)</em> Deployment Name as specified in OverOps. See: <a href='https://confluence.atlassian.com/bamboo/bamboo-variables-289277087.html' target='_blank' rel='nofollow'>Bamboo variables</a>"/]
+[@ww.textfield labelKey="com.overops.plugins.bamboo.task.config.applicationName" name="applicationName" required="false" description="<em>(Optional)</em> Application Name as specified in OverOps. If blank, a Deplyment Name must be provided."/]
+[@ww.textfield labelKey="com.overops.plugins.bamboo.task.config.deploymentName" name="deploymentName" required="false" description="<em>(Optional)</em> Deployment Name as specified in OverOps. If blank, an Application Name must be provided. See: <a href='https://confluence.atlassian.com/bamboo/bamboo-variables-289277087.html' target='_blank' rel='nofollow'>Bamboo variables</a>"/]
 <hr class="divider"/>
 [@ww.textfield labelKey="com.overops.plugins.bamboo.task.config.regexFilter" name="regexFilter" required="false" description="<em>(Optional)</em> Ignore specific event types when generating the OverOps Reliability report. Event types include: <em>Uncaught Exception, Caught Exception, Swallowed Exception, Logged Error, Logged Warning, Timer</em>. For example: <code class='inline'>\"type\":\"s*(Logged Error|Logged Warning|Timer)\"</code>" /]
 <hr class="divider"/>

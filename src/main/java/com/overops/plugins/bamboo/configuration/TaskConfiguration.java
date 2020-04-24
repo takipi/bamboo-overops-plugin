@@ -136,6 +136,10 @@ public class TaskConfiguration extends AbstractTaskConfigurator implements Build
             errorCollection.addError(Const.ENV_ID, "Invalid environment ID");
         }
 
+        if ((params.getString(Const.APP_NAME).trim().length() == 0) && (params.getString(Const.DEP_NAME).trim().length() == 0)) {
+            errorCollection.addError(Const.APP_NAME, "Must provide an Application Name, or a Deployment Name, or both.");
+        }
+
         // validate total errors
         validNumber(Const.TOP_ERROR_COUNT);
         validNumber(Const.MAX_ERROR_VOLUME, Const.CHECK_VOLUME_ERRORS);

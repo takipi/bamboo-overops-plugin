@@ -1,11 +1,16 @@
 package com.overops.plugins.bamboo;
 
 import java.io.PrintWriter;
+import java.io.PrintStream;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import com.atlassian.bamboo.build.logger.BuildLogger;
+import com.atlassian.bamboo.configuration.ConfigurationMap;
 import com.atlassian.bamboo.process.ProcessService;
 import com.atlassian.bamboo.task.TaskContext;
 import com.atlassian.bamboo.task.TaskException;
@@ -16,13 +21,16 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.overops.plugins.bamboo.configuration.Const;
-import com.overops.plugins.bamboo.model.OverOpsReportModel;
-import com.overops.plugins.bamboo.model.QueryOverOps;
-import com.overops.plugins.bamboo.service.OverOpsService;
-import com.overops.plugins.bamboo.service.impl.OverOpsServiceImpl;
-import com.overops.plugins.bamboo.service.impl.ReportBuilder;
-import com.overops.plugins.bamboo.utils.ReportUtils;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.overops.plugins.bamboo.configuration.Const;
+import com.overops.plugins.bamboo.service.impl.BambooPrintWriter;
+import com.overops.report.service.QualityReportParams;
+import com.overops.report.service.ReportService;
+import com.overops.report.service.ReportService.Requestor;
+import com.overops.report.service.model.QualityReport;
+import com.overops.report.service.model.QualityReport.ReportStatus;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -32,11 +40,11 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
     @ComponentImport
     private PluginSettingsFactory pluginSettingsFactory;
 
-    private OverOpsService overOpsService;
+    private ReportService overOpsService;
     private ObjectMapper objectMapper;
 
     public TaskType(PluginSettingsFactory pluginSettingsFactory) {
-        this.overOpsService = new OverOpsServiceImpl();
+        this.overOpsService = new ReportService();
         this.objectMapper = new ObjectMapper();
         this.pluginSettingsFactory = pluginSettingsFactory;
     }
@@ -49,28 +57,31 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
 
         logger.addBuildLogEntry("Generating OverOps Quality Report");
 
-        // get global plugin settings
-        PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
+        PluginSettings globalSettings = pluginSettingsFactory.createGlobalSettings();
 
-        Map<String, String> globalSettings = new HashMap<>(3);
-        globalSettings.put(Const.GLOBAL_API_URL, (String) pluginSettings.get(Const.GLOBAL_API_URL));
-        globalSettings.put(Const.GLOBAL_API_TOKEN, (String) pluginSettings.get(Const.GLOBAL_API_TOKEN));
-        globalSettings.put(Const.GLOBAL_ENV_ID, (String) pluginSettings.get(Const.GLOBAL_ENV_ID));
-
-        QueryOverOps query = QueryOverOps.mapToObject(context.getConfigurationMap(), globalSettings);
+        String endPoint = (String)globalSettings.get(Const.GLOBAL_API_URL);
+        String apiKey = (String)globalSettings.get(Const.GLOBAL_API_TOKEN);
+        
+        QualityReportParams query = getQualityReportParams(context.getConfigurationMap());
+        String envId = query.getServiceId();
+        if (StringUtils.isBlank(envId)) {
+            query.setServiceId((String)globalSettings.get(Const.GLOBAL_ENV_ID));
+        }
 
         TaskResultBuilder resultBuilder = TaskResultBuilder.newBuilder(context);
 
         try {
             logger.addBuildLogEntry("[" + Utils.getArtifactId() + " v" + Utils.getVersion() + "]");
 
-            ReportBuilder.QualityReport report = overOpsService.perform(query, logger);
-            OverOpsReportModel overOpsReport = ReportUtils.copyResult(report);
+            boolean isDebug = Boolean.parseBoolean(context.getConfigurationMap().get(Const.DEBUG));
+            PrintStream printStream = isDebug ? new BambooPrintWriter(System.out, logger) : null;
 
-            context.getBuildContext().getBuildResult().getCustomBuildData().put("overOpsReport", objectMapper.writeValueAsString(overOpsReport));
+            QualityReport reportModel = overOpsService.runQualityReport(endPoint, apiKey, query, Requestor.BAMBOO, printStream, isDebug);
+
+            context.getBuildContext().getBuildResult().getCustomBuildData().put("overOpsReport", objectMapper.writeValueAsString(reportModel.getHtmlParts()));
             context.getBuildContext().getBuildResult().getCustomBuildData().put("isOverOpsStep", "true");
 
-            if (overOpsReport.isMarkedUnstable() && overOpsReport.isUnstable()) {
+            if (reportModel.getStatusCode() == ReportStatus.FAILED) {
                 return resultBuilder.failed().build();
             } else {
                 return resultBuilder.success().build();
@@ -89,4 +100,34 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         }
     }
 
+    private QualityReportParams getQualityReportParams(ConfigurationMap params) {
+        QualityReportParams qrp = new QualityReportParams();
+
+        qrp.setServiceId((String)params.get(Const.ENV_ID));
+        qrp.setApplicationName(params.get(Const.APP_NAME));
+        qrp.setDeploymentName(params.get(Const.DEP_NAME));
+
+        qrp.setRegexFilter(params.get(Const.REGEX_FILTER));
+        qrp.setMarkUnstable(Boolean.parseBoolean(params.get(Const.MARK_UNSTABLE)));
+        qrp.setPrintTopIssues(NumberUtils.toInt(params.get(Const.TOP_ERROR_COUNT), 0));
+
+        qrp.setNewEvents(Boolean.parseBoolean(params.get(Const.CHECK_NEW_ERRORS)));
+        qrp.setResurfacedErrors(Boolean.parseBoolean(params.get(Const.CHECK_RESURFACED_ERRORS)));
+
+        qrp.setMaxErrorVolume(NumberUtils.toInt(params.get(Const.MAX_ERROR_VOLUME), 0));
+        qrp.setMaxUniqueErrors(NumberUtils.toInt(params.get(Const.MAX_UNIQUE_ERRORS), 0));
+
+        qrp.setCriticalExceptionTypes(params.getOrDefault(Const.CRITICAL_EXCEPTION_TYPES, ""));
+
+        qrp.setActiveTimespan(params.get(Const.ACTIVE_TIMESPAN));
+        qrp.setBaselineTimespan(params.get(Const.BASELINE_TIMESPAN));
+        qrp.setMinVolumeThreshold(NumberUtils.toInt(params.get(Const.MIN_VOLUME_THRESHOLD), 0));
+        qrp.setMinErrorRateThreshold(NumberUtils.toDouble(params.get(Const.MIN_RATE_THRESHOLD), 0));
+        qrp.setRegressionDelta(NumberUtils.toDouble(params.get(Const.REGRESSION_DELTA), 0));
+        qrp.setCriticalRegressionDelta(NumberUtils.toDouble(params.get(Const.CRITICAL_REGRESSION_THRESHOLD), 0));
+        qrp.setApplySeasonality(Boolean.parseBoolean(params.get(Const.APPLY_SEASONALITY)));
+
+        qrp.setDebug(Boolean.parseBoolean(params.get(Const.DEBUG)));
+        return qrp;
+    }
 }

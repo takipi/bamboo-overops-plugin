@@ -100,6 +100,13 @@
             <version>${takipi.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.takipi</groupId>
+            <artifactId>report-service</artifactId>
+            <version>${takipi.version}</version>
+        </dependency>
+
+
         <!-- WIRED TEST RUNNER DEPENDENCIES -->
         <dependency>
             <groupId>com.atlassian.plugins</groupId>

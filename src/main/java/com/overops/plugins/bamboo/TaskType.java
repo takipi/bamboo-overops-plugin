@@ -70,7 +70,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         try {
             logger.addBuildLogEntry("[" + Utils.getArtifactId() + " v" + Utils.getVersion() + "]");
 
-            QualityReport reportModel = overOpsService.runQualityReport(endPoint, apiKey, query, Requestor.BAMBOO);
+            QualityReport reportModel = overOpsService.runQualityReport(endPoint, apiKey, query, Requestor.BAMBOO, logger, Boolean.parseBoolean(context.getConfigurationMap().get(Const.DEBUG)));
 
             context.getBuildContext().getBuildResult().getCustomBuildData().put("overOpsReport", objectMapper.writeValueAsString(reportModel.getHtmlParts()));
             context.getBuildContext().getBuildResult().getCustomBuildData().put("isOverOpsStep", "true");

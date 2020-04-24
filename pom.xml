@@ -37,7 +37,6 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <!-- api-client local dev build with https://github.com/takipi/api-client/pull/147 -->
         <takipi.version>2.33.0</takipi.version>
-        <report.version>2.32.0</report.version>
     </properties>
 
     <dependencies>
@@ -104,7 +103,7 @@
         <dependency>
             <groupId>com.takipi</groupId>
             <artifactId>report-service</artifactId>
-            <version>${report.version}</version>
+            <version>${takipi.version}</version>
         </dependency>
 
 

@@ -1,9 +1,11 @@
 package com.overops.plugins.bamboo;
 
 import java.io.PrintWriter;
+import java.io.PrintStream;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -23,6 +25,7 @@ import com.overops.plugins.bamboo.configuration.Const;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.overops.plugins.bamboo.configuration.Const;
+import com.overops.plugins.bamboo.service.impl.BambooPrintWriter;
 import com.overops.report.service.QualityReportParams;
 import com.overops.report.service.ReportService;
 import com.overops.report.service.ReportService.Requestor;
@@ -70,7 +73,10 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         try {
             logger.addBuildLogEntry("[" + Utils.getArtifactId() + " v" + Utils.getVersion() + "]");
 
-            QualityReport reportModel = overOpsService.runQualityReport(endPoint, apiKey, query, Requestor.BAMBOO, logger, Boolean.parseBoolean(context.getConfigurationMap().get(Const.DEBUG)));
+            boolean isDebug = Boolean.parseBoolean(context.getConfigurationMap().get(Const.DEBUG));
+            PrintStream printStream = isDebug ? new BambooPrintWriter(System.out, logger) : null;
+
+            QualityReport reportModel = overOpsService.runQualityReport(endPoint, apiKey, query, Requestor.BAMBOO, printStream, isDebug);
 
             context.getBuildContext().getBuildResult().getCustomBuildData().put("overOpsReport", objectMapper.writeValueAsString(reportModel.getHtmlParts()));
             context.getBuildContext().getBuildResult().getCustomBuildData().put("isOverOpsStep", "true");

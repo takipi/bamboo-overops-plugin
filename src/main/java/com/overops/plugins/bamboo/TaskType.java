@@ -114,18 +114,41 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         qrp.setNewEvents(Boolean.parseBoolean(params.get(Const.CHECK_NEW_ERRORS)));
         qrp.setResurfacedErrors(Boolean.parseBoolean(params.get(Const.CHECK_RESURFACED_ERRORS)));
 
-        qrp.setMaxErrorVolume(NumberUtils.toInt(params.get(Const.MAX_ERROR_VOLUME), 0));
-        qrp.setMaxUniqueErrors(NumberUtils.toInt(params.get(Const.MAX_UNIQUE_ERRORS), 0));
+        if (Boolean.parseBoolean(params.get(Const.CHECK_VOLUME_ERRORS))) {
+            qrp.setMaxErrorVolume(Math.max(1, NumberUtils.toInt(params.get(Const.MAX_ERROR_VOLUME), 1)));
+        } else {
+            qrp.setMaxErrorVolume(0);
+        }
 
-        qrp.setCriticalExceptionTypes(params.getOrDefault(Const.CRITICAL_EXCEPTION_TYPES, ""));
+        if (Boolean.parseBoolean(params.get(Const.CHECK_UNIQUE_ERRORS))) {
+            qrp.setMaxUniqueErrors(Math.max(1, NumberUtils.toInt(params.get(Const.MAX_UNIQUE_ERRORS), 1)));    
+        } else {
+            qrp.setMaxUniqueErrors(0);    
+        }
 
-        qrp.setActiveTimespan(params.get(Const.ACTIVE_TIMESPAN));
-        qrp.setBaselineTimespan(params.get(Const.BASELINE_TIMESPAN));
-        qrp.setMinVolumeThreshold(NumberUtils.toInt(params.get(Const.MIN_VOLUME_THRESHOLD), 0));
-        qrp.setMinErrorRateThreshold(NumberUtils.toDouble(params.get(Const.MIN_RATE_THRESHOLD), 0));
-        qrp.setRegressionDelta(NumberUtils.toDouble(params.get(Const.REGRESSION_DELTA), 0));
-        qrp.setCriticalRegressionDelta(NumberUtils.toDouble(params.get(Const.CRITICAL_REGRESSION_THRESHOLD), 0));
-        qrp.setApplySeasonality(Boolean.parseBoolean(params.get(Const.APPLY_SEASONALITY)));
+        if (Boolean.parseBoolean(params.get(Const.CHECK_CRITICAL_ERRORS))) {
+            qrp.setCriticalExceptionTypes(params.getOrDefault(Const.CRITICAL_EXCEPTION_TYPES, ""));
+        } else {
+            qrp.setCriticalExceptionTypes("");
+        }
+
+        if (Boolean.parseBoolean(params.get(Const.CHECK_INCREASING_ERRORS))) {
+            qrp.setActiveTimespan(params.get(Const.ACTIVE_TIMESPAN));
+            qrp.setBaselineTimespan(params.get(Const.BASELINE_TIMESPAN));
+            qrp.setMinVolumeThreshold(NumberUtils.toInt(params.get(Const.MIN_VOLUME_THRESHOLD), 0));
+            qrp.setMinErrorRateThreshold(NumberUtils.toDouble(params.get(Const.MIN_RATE_THRESHOLD), 0));
+            qrp.setRegressionDelta(NumberUtils.toDouble(params.get(Const.REGRESSION_DELTA), 0));
+            qrp.setCriticalRegressionDelta(NumberUtils.toDouble(params.get(Const.CRITICAL_REGRESSION_THRESHOLD), 0));
+            qrp.setApplySeasonality(Boolean.parseBoolean(params.get(Const.APPLY_SEASONALITY)));
+        } else {
+            qrp.setActiveTimespan("0");
+            qrp.setBaselineTimespan("0");
+            qrp.setMinVolumeThreshold(0);
+            qrp.setMinErrorRateThreshold(0);
+            qrp.setRegressionDelta(0);
+            qrp.setCriticalRegressionDelta(0);
+            qrp.setApplySeasonality(false);
+        }
 
         qrp.setDebug(Boolean.parseBoolean(params.get(Const.DEBUG)));
         return qrp;

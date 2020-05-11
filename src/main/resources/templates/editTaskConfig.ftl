@@ -51,6 +51,8 @@
 [@ww.textfield labelKey="com.overops.plugins.bamboo.task.config.topErrorCount" name="topErrorCount" required="false" description="The number of total and unique errors to show in the quality report, sorted by volume." /]
 <hr class="divider"/>
 [@ww.checkbox labelKey="com.overops.plugins.bamboo.task.config.markUnstable" name="markUnstable" required="false" description="If checked the build will be marked unstable when any quality gates fail."/]
+<hr class="divider"/>
+[@ww.checkbox labelKey="com.overops.plugins.bamboo.task.config.showAllEvents" name="showAllEvents" required="false" description="If checked the quality report will list events for both passed and failed quality gates, otherwise only events for failed gates will be displayed."/]
 
 <h3>Quality Gate settings</h3>
 [@ww.checkbox labelKey="com.overops.plugins.bamboo.task.config.checkNewErrors" name="checkNewErrors" required="false" description="Check if the current build has any new errors." /]
@@ -81,22 +83,9 @@
     [@ww.textfield labelKey="com.overops.plugins.bamboo.task.config.criticalExceptionTypes" name="criticalExceptionTypes" required="false" description="A comma delimited list of critical exception types. For example: <code class='inline'>NullPointerException,IndexOutOfBoundsException</code>"/]
 </details>
 
-<hr class="divider"/>
-
-<details class="quality-gate-options" [#if checkIncreasingErrors = "true"] open [/#if]>
-    <summary>
-        [@ww.checkbox labelKey="com.overops.plugins.bamboo.task.config.checkIncreasingErrors" name="checkIncreasingErrors" class="checkbox toggle-details" required="false" tabindex="-1" description="Use this Gate to detect increasing errors in your current build versus a given baseline."/]
-    </summary>
-    [@ww.textfield labelKey="com.overops.plugins.bamboo.task.config.activeTimespan" name="activeTimespan" required="false" description="The time window to search for new and increasing errors. Set to zero to use the entire deployment time window. Supported values are: <strong>d</strong> - day, <strong>h</strong> - hour, <strong>m</strong> - minute. For example: <code class='inline'>12h</code>"/]
-    [@ww.textfield labelKey="com.overops.plugins.bamboo.task.config.baselineTimespan" name="baselineTimespan" required="false" description="The time window against which events in the active window are compared to test for regressions. Supported values are: <strong>d</strong> - day, <strong>h</strong> - hour, <strong>m</strong> - minute. For example: <code class='inline'>7d</code>"/]
-    [@ww.textfield labelKey="com.overops.plugins.bamboo.task.config.minVolumeThreshold" name="minVolumeThreshold" required="false" description="The minimal number of times an event of a non-critical type must take place to be considered critical."/]
-    [@ww.textfield labelKey="com.overops.plugins.bamboo.task.config.minRateThreshold" name="minRateThreshold" required="false" description="The minimum rate at which event of a non-critical type must take place to be considered critical."/]
-    [@ww.textfield labelKey="com.overops.plugins.bamboo.task.config.regressionDelta" name="regressionDelta" required="false" description="The change in percentage between an event's rate in the active time span compared to the baseline to be considered a regression."/]
-    [@ww.textfield labelKey="com.overops.plugins.bamboo.task.config.criticalRegressionThreshold" name="criticalRegressionThreshold" required="false" description="The change in percentage between an event's rate in the active time span compared to the baseline to be considered a critical error."/]
-    [@ww.checkbox labelKey="com.overops.plugins.bamboo.task.config.applySeasonality" name="applySeasonality" required="false" description="If peaks have been seen in baseline window, then this would be considered normal and not a regression. If an equal or matching peak exists in the baseline time window, or two peaks of greater than 50% of the volume seen in the active window, the event will not be marked as a regression."/]
-</details>
-
 <h3>Advanced settings</h3>
+[@ww.checkbox labelKey="com.overops.plugins.bamboo.task.config.passOnQRException" name="passOnQRException" required="false" description="If checked, inability to run the OverOps reliability report will not fail the build."/]
+<hr class="divider"/>
 [@ww.checkbox labelKey="com.overops.plugins.bamboo.task.config.debug" name="debug" required="false" description="If checked, all queries with results will be displayed in the OverOps reliability report. <em>For debugging purposes only.</em>"/]
 
 <script type="text/javascript">

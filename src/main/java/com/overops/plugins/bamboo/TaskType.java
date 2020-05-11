@@ -73,15 +73,19 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         try {
             logger.addBuildLogEntry("[" + Utils.getArtifactId() + " v" + Utils.getVersion() + "]");
 
+            boolean showAllEvents = Boolean.parseBoolean(context.getConfigurationMap().get(Const.SHOW_ALL_EVENTS));
             boolean isDebug = Boolean.parseBoolean(context.getConfigurationMap().get(Const.DEBUG));
             PrintStream printStream = isDebug ? new BambooPrintWriter(System.out, logger) : null;
 
             QualityReport reportModel = overOpsService.runQualityReport(endPoint, apiKey, query, Requestor.BAMBOO, printStream, isDebug);
 
-            context.getBuildContext().getBuildResult().getCustomBuildData().put("overOpsReport", objectMapper.writeValueAsString(reportModel.getHtmlParts()));
+            context.getBuildContext().getBuildResult().getCustomBuildData().put("overOpsReport", objectMapper.writeValueAsString(reportModel.getHtmlParts(showAllEvents)));
             context.getBuildContext().getBuildResult().getCustomBuildData().put("isOverOpsStep", "true");
 
             if (reportModel.getStatusCode() == ReportStatus.FAILED) {
+                if ((reportModel.getExceptionDetails() != null) && Boolean.parseBoolean(context.getConfigurationMap().get(Const.PASS_BUILD_ON_QR_EXCEPTION))) {
+                    return resultBuilder.success().build();
+                }
                 return resultBuilder.failed().build();
             } else {
                 return resultBuilder.success().build();
@@ -132,23 +136,13 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             qrp.setCriticalExceptionTypes("");
         }
 
-        if (Boolean.parseBoolean(params.get(Const.CHECK_INCREASING_ERRORS))) {
-            qrp.setActiveTimespan(params.get(Const.ACTIVE_TIMESPAN));
-            qrp.setBaselineTimespan(params.get(Const.BASELINE_TIMESPAN));
-            qrp.setMinVolumeThreshold(NumberUtils.toInt(params.get(Const.MIN_VOLUME_THRESHOLD), 0));
-            qrp.setMinErrorRateThreshold(NumberUtils.toDouble(params.get(Const.MIN_RATE_THRESHOLD), 0));
-            qrp.setRegressionDelta(NumberUtils.toDouble(params.get(Const.REGRESSION_DELTA), 0));
-            qrp.setCriticalRegressionDelta(NumberUtils.toDouble(params.get(Const.CRITICAL_REGRESSION_THRESHOLD), 0));
-            qrp.setApplySeasonality(Boolean.parseBoolean(params.get(Const.APPLY_SEASONALITY)));
-        } else {
-            qrp.setActiveTimespan("0");
-            qrp.setBaselineTimespan("0");
-            qrp.setMinVolumeThreshold(0);
-            qrp.setMinErrorRateThreshold(0);
-            qrp.setRegressionDelta(0);
-            qrp.setCriticalRegressionDelta(0);
-            qrp.setApplySeasonality(false);
-        }
+        qrp.setActiveTimespan("0");
+        qrp.setBaselineTimespan("0");
+        qrp.setMinVolumeThreshold(0);
+        qrp.setMinErrorRateThreshold(0);
+        qrp.setRegressionDelta(0);
+        qrp.setCriticalRegressionDelta(0);
+        qrp.setApplySeasonality(false);
 
         qrp.setDebug(Boolean.parseBoolean(params.get(Const.DEBUG)));
         return qrp;

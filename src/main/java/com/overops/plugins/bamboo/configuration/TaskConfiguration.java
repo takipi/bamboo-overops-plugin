@@ -44,6 +44,8 @@ public class TaskConfiguration extends AbstractTaskConfigurator implements Build
         context.put(Const.REGEX_FILTER, config.get(Const.REGEX_FILTER));
         context.put(Const.TOP_ERROR_COUNT, config.get(Const.TOP_ERROR_COUNT));
         context.put(Const.MARK_UNSTABLE, config.get(Const.MARK_UNSTABLE));
+        context.put(Const.SHOW_ALL_EVENTS, config.get(Const.SHOW_ALL_EVENTS));
+        context.put(Const.PASS_BUILD_ON_QR_EXCEPTION, config.get(Const.PASS_BUILD_ON_QR_EXCEPTION));
 
         // new and resurfaced quality gates
         context.put(Const.CHECK_NEW_ERRORS, config.get(Const.CHECK_NEW_ERRORS));
@@ -60,16 +62,6 @@ public class TaskConfiguration extends AbstractTaskConfigurator implements Build
         // critical errors quality gate
         context.put(Const.CHECK_CRITICAL_ERRORS, config.get(Const.CHECK_CRITICAL_ERRORS));
         context.put(Const.CRITICAL_EXCEPTION_TYPES, config.get(Const.CRITICAL_EXCEPTION_TYPES));
-
-        // increasing errors quality gate
-        context.put(Const.CHECK_INCREASING_ERRORS, config.get(Const.CHECK_INCREASING_ERRORS));
-        context.put(Const.ACTIVE_TIMESPAN, config.get(Const.ACTIVE_TIMESPAN));
-        context.put(Const.BASELINE_TIMESPAN, config.get(Const.BASELINE_TIMESPAN));
-        context.put(Const.MIN_VOLUME_THRESHOLD, config.get(Const.MIN_VOLUME_THRESHOLD));
-        context.put(Const.MIN_RATE_THRESHOLD, config.get(Const.MIN_RATE_THRESHOLD));
-        context.put(Const.REGRESSION_DELTA, config.get(Const.REGRESSION_DELTA));
-        context.put(Const.CRITICAL_REGRESSION_THRESHOLD, config.get(Const.CRITICAL_REGRESSION_THRESHOLD));
-        context.put(Const.APPLY_SEASONALITY, config.get(Const.APPLY_SEASONALITY));
 
         // advanced settings
         context.put(Const.DEBUG, config.get(Const.DEBUG));
@@ -90,6 +82,8 @@ public class TaskConfiguration extends AbstractTaskConfigurator implements Build
         config.put(Const.REGEX_FILTER, params.getString(Const.REGEX_FILTER));
         config.put(Const.TOP_ERROR_COUNT, params.getString(Const.TOP_ERROR_COUNT));
         config.put(Const.MARK_UNSTABLE, params.getString(Const.MARK_UNSTABLE));
+        config.put(Const.SHOW_ALL_EVENTS, params.getString(Const.SHOW_ALL_EVENTS));
+        config.put(Const.PASS_BUILD_ON_QR_EXCEPTION, params.getString(Const.PASS_BUILD_ON_QR_EXCEPTION));
 
         // new and resurfaced quality gates
         config.put(Const.CHECK_NEW_ERRORS, params.getString(Const.CHECK_NEW_ERRORS));
@@ -106,16 +100,6 @@ public class TaskConfiguration extends AbstractTaskConfigurator implements Build
         // critical errors quality gate
         config.put(Const.CHECK_CRITICAL_ERRORS, params.getString(Const.CHECK_CRITICAL_ERRORS));
         config.put(Const.CRITICAL_EXCEPTION_TYPES, params.getString(Const.CRITICAL_EXCEPTION_TYPES));
-
-        // increasing errors quality gate
-        config.put(Const.CHECK_INCREASING_ERRORS, params.getString(Const.CHECK_INCREASING_ERRORS));
-        config.put(Const.ACTIVE_TIMESPAN, params.getString(Const.ACTIVE_TIMESPAN).toLowerCase()); // D,H,M -> d,h,m
-        config.put(Const.BASELINE_TIMESPAN, params.getString(Const.BASELINE_TIMESPAN).toLowerCase());
-        config.put(Const.MIN_VOLUME_THRESHOLD, params.getString(Const.MIN_VOLUME_THRESHOLD));
-        config.put(Const.MIN_RATE_THRESHOLD, params.getString(Const.MIN_RATE_THRESHOLD));
-        config.put(Const.REGRESSION_DELTA, params.getString(Const.REGRESSION_DELTA));
-        config.put(Const.CRITICAL_REGRESSION_THRESHOLD, params.getString(Const.CRITICAL_REGRESSION_THRESHOLD));
-        config.put(Const.APPLY_SEASONALITY, params.getString(Const.APPLY_SEASONALITY));
 
         // advanced settings
         config.put(Const.DEBUG, params.getString(Const.DEBUG));
@@ -144,13 +128,6 @@ public class TaskConfiguration extends AbstractTaskConfigurator implements Build
         // validate critical errors
         validString(Const.CRITICAL_EXCEPTION_TYPES, Const.CHECK_CRITICAL_ERRORS);
 
-        // validate increasing errors
-        validTimeWindow(Const.ACTIVE_TIMESPAN, Const.CHECK_INCREASING_ERRORS);
-        validTimeWindow(Const.BASELINE_TIMESPAN, Const.CHECK_INCREASING_ERRORS);
-        validNumber(Const.MIN_VOLUME_THRESHOLD, Const.CHECK_INCREASING_ERRORS);
-        validRange(Const.MIN_RATE_THRESHOLD, Const.CHECK_INCREASING_ERRORS);
-        validRange(Const.REGRESSION_DELTA, Const.CHECK_INCREASING_ERRORS);
-        validRange(Const.CRITICAL_REGRESSION_THRESHOLD, Const.CHECK_INCREASING_ERRORS);
     }
 
     // must be a number

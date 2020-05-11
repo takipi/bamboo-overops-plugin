@@ -21,6 +21,9 @@ public class Const {
     public static final String REGEX_FILTER = "regexFilter";
     public static final String TOP_ERROR_COUNT = "topErrorCount";
     public static final String MARK_UNSTABLE = "markUnstable";
+    public static final String SHOW_ALL_EVENTS = "showAllEvents";
+    public static final String PASS_BUILD_ON_QR_EXCEPTION = "passOnQRException";
+
 
     public static final String CHECK_NEW_ERRORS = "checkNewErrors";
     public static final String CHECK_RESURFACED_ERRORS = "checkResurfacedErrors";
@@ -34,17 +37,7 @@ public class Const {
     public static final String CHECK_CRITICAL_ERRORS = "checkCriticalErrors";
     public static final String CRITICAL_EXCEPTION_TYPES = "criticalExceptionTypes";
 
-    public static final String CHECK_INCREASING_ERRORS = "checkIncreasingErrors";
-    public static final String ACTIVE_TIMESPAN = "activeTimespan";
-    public static final String BASELINE_TIMESPAN = "baselineTimespan";
-    public static final String MIN_VOLUME_THRESHOLD = "minVolumeThreshold";
-    public static final String MIN_RATE_THRESHOLD = "minRateThreshold";
-    public static final String REGRESSION_DELTA = "regressionDelta";
-    public static final String CRITICAL_REGRESSION_THRESHOLD = "criticalRegressionThreshold";
-    public static final String APPLY_SEASONALITY = "applySeasonality";
-
     public static final String DEBUG = "debug";
-
 
     // default values
     public static final String DEFAULT_API_URL = "https://api.overops.com/";

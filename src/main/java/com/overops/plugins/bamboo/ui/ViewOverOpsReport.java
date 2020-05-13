@@ -6,7 +6,7 @@ import com.atlassian.bamboo.chains.ChainStageResult;
 import com.atlassian.bamboo.resultsummary.BuildResultsSummary;
 import com.atlassian.bamboo.resultsummary.BuildResultsSummaryImpl;
 import com.atlassian.bamboo.resultsummary.ResultsSummary;
-import com.overops.plugins.bamboo.model.OverOpsReportModel;
+import com.overops.report.service.model.HtmlParts;
 import com.overops.plugins.bamboo.utils.Util;
 import org.apache.log4j.Logger;
 
@@ -21,7 +21,7 @@ public class ViewOverOpsReport extends PlanResultsAction {
     private static final long serialVersionUID = 1L;
     private static final Logger log = Logger.getLogger(ViewOverOpsReport.class);
 
-    private OverOpsReportModel report;
+    private HtmlParts report;
 
     public String execute() throws Exception {
         String result = super.execute();
@@ -37,7 +37,7 @@ public class ViewOverOpsReport extends PlanResultsAction {
                     for (String key : customBuildData.keySet()) {
                         if (key.startsWith("overOpsReport")) {
                             log.debug("Found report link for master =" + key);
-                            report = Util.stringToObject(customBuildData.get(key), OverOpsReportModel.class);
+                            report = Util.stringToObject(customBuildData.get(key), HtmlParts.class);
                         }
                     }
                 }
@@ -49,7 +49,7 @@ public class ViewOverOpsReport extends PlanResultsAction {
             for (String key : customBuildData.keySet()) {
                 if (key.startsWith("overOpsReport")) {
                     log.debug("Found report link for master =" + key);
-                    report = Util.stringToObject(customBuildData.get(key), OverOpsReportModel.class);
+                    report = Util.stringToObject(customBuildData.get(key), HtmlParts.class);
                 }
             }
         }
@@ -57,11 +57,11 @@ public class ViewOverOpsReport extends PlanResultsAction {
         return result;
     }
 
-    public OverOpsReportModel getReport() {
+    public HtmlParts getReport() {
         return report;
     }
 
-    public void setReport(OverOpsReportModel report) {
+    public void setReport(HtmlParts report) {
         this.report = report;
     }
 }

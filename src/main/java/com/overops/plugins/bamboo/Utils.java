@@ -8,14 +8,17 @@ public class Utils {
     private Utils() {
     }
 
+    public static String getVersion() throws IOException {
+        return getProperty("version");
+    }
 
-    public static String getVersion() {
+    public static String getArtifactId() throws IOException {
+        return getProperty("artifactId");
+    }
+
+    private static String getProperty(String prop) throws IOException {
         Properties props = new Properties();
-        try {
-            props.load(Utils.class.getResourceAsStream("/version.properties"));
-        } catch (IOException ex) {
-            props.setProperty("version", "N/A");
-        }
-        return props.getProperty("version");
+        props.load(Utils.class.getResourceAsStream("/version.properties"));
+        return props.getProperty(prop);
     }
 }

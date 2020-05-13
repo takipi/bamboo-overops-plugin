@@ -1,75 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <properties>
-        <bamboo.version>6.2.2</bamboo.version>
-        <bamboo.data.version>5.7.2</bamboo.data.version>
-        <amps.version>6.3.6</amps.version>
-        <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
-        <version.takipi>2.23.0</version.takipi>
-    </properties>
-
-
     <groupId>com.overops.plugins</groupId>
-    <artifactId>bamboo</artifactId>
-    <version>1.0.0</version>
-
-    <name>OverOps Quality test</name>
-    <description>This plugin will check a build for errors in OverOps.</description>
-    <url>https://github.com/takipi/bamboo-overops-plugin</url>
-    <packaging>atlassian-plugin</packaging>
+    <artifactId>overops-bamboo-app</artifactId>
+    <version>1.1.0</version>
 
     <organization>
         <name>OverOps</name>
         <url>https://www.overops.com/</url>
     </organization>
 
-    <repositories>
-        <repository>
-            <id>maven-central</id>
-            <name>Maven Central</name>
-            <url>http://repo1.maven.org/maven2</url>
-        </repository>
-    </repositories>
+    <name>OverOps Quality Report</name>
+    <description>
+        This app provides a mechanism for applying OverOps severity assignment and regression analysis
+        to new builds to allow application owners, DevOps engineers, and SREs to determine the quality of
+        their code before promoting it into production. Run the OverOps Quality Report task after all
+        other testing is complete to generate a Quality Report that will determine the stability of the
+        build. From the Quality Report you can drill down into each specific error using the OverOps
+        Automated Root Cause analysis screen to solve the issue.
+    </description>
+    <url>https://github.com/takipi/bamboo-overops-plugin</url>
+    <packaging>atlassian-plugin</packaging>
+
+    <properties>
+        <bamboo.version>6.8.0</bamboo.version>
+        <bamboo.data.version>6.8.0</bamboo.data.version>
+        <amps.version>8.0.2</amps.version>
+        <plugin.testrunner.version>2.0.1</plugin.testrunner.version>
+        <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
+        <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <!-- api-client local dev build with https://github.com/takipi/api-client/pull/147 -->
+        <takipi.version>2.33.0</takipi.version>
+    </properties>
 
     <dependencies>
-       <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.1</version>
-       </dependency>
         <dependency>
             <groupId>com.atlassian.bamboo</groupId>
             <artifactId>atlassian-bamboo-web</artifactId>
             <version>${bamboo.version}</version>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
         </dependency>
 
-        <!-- WIRED TEST RUNNER DEPENDENCIES -->
         <dependency>
-            <groupId>com.atlassian.plugins</groupId>
-            <artifactId>atlassian-plugins-osgi-testrunner</artifactId>
-            <version>${plugin.testrunner.version}</version>
+            <groupId>com.atlassian.plugin</groupId>
+            <artifactId>atlassian-spring-scanner-annotation</artifactId>
+            <version>${atlassian.spring.scanner.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.atlassian.plugin</groupId>
+            <artifactId>atlassian-spring-scanner-runtime</artifactId>
+            <version>${atlassian.spring.scanner.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>com.atlassian.templaterenderer</groupId>
             <artifactId>atlassian-template-renderer-api</artifactId>
@@ -80,7 +85,7 @@
         <dependency>
             <groupId>com.takipi</groupId>
             <artifactId>api-client</artifactId>
-            <version>${version.takipi}</version>
+            <version>${takipi.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -88,66 +93,102 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>com.takipi</groupId>
             <artifactId>api-client-util</artifactId>
-            <version>${version.takipi}</version>
+            <version>${takipi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.takipi</groupId>
+            <artifactId>report-service</artifactId>
+            <version>${takipi.version}</version>
+        </dependency>
+
+
+        <!-- WIRED TEST RUNNER DEPENDENCIES -->
+        <dependency>
+            <groupId>com.atlassian.plugins</groupId>
+            <artifactId>atlassian-plugins-osgi-testrunner</artifactId>
+            <version>${plugin.testrunner.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>jsr311-api</artifactId>
+            <version>1.1.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.2-atlassian-1</version>
         </dependency>
     </dependencies>
     <build>
+        <resources>
+            <resource>
+              <directory>src/main/resources</directory>
+              <filtering>true</filtering>
+            </resource>
+          </resources>
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-bamboo-plugin</artifactId>
+                <artifactId>bamboo-maven-plugin</artifactId>
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <productVersion>${bamboo.version}</productVersion>
                     <productDataVersion>${bamboo.data.version}</productDataVersion>
+                    <enableQuickReload>true</enableQuickReload>
+
+                    <!-- See here for an explanation of default instructions: -->
+                    <!-- https://developer.atlassian.com/docs/advanced-topics/configuration-of-instructions-in-atlassian-plugins -->
+                    <instructions>
+                        <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
+
+                        <!-- Add package to export here -->
+                        <Export-Package>
+                            com.overops.plugins,
+                        </Export-Package>
+
+                        <!-- Add package import here -->
+                        <Import-Package>
+                            org.joda.convert.*;
+                            org.springframework.osgi.*;resolution:="optional",
+                            org.eclipse.gemini.blueprint.*;resolution:="optional",
+                            *
+                        </Import-Package>
+
+                        <!-- Ensure plugin is spring powered -->
+                        <Spring-Context>*</Spring-Context>
+                    </instructions>
                 </configuration>
             </plugin>
+
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.20</version>
-                <configuration>
-                    <skipTests>false</skipTests>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
+                <groupId>com.atlassian.plugin</groupId>
+                <artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
+                <version>${atlassian.spring.scanner.version}</version>
                 <executions>
                     <execution>
-                        <id>copy-resources</id>
-                        <!-- here the phase you need -->
-                        <phase>validate</phase>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>atlassian-spring-scanner</goal>
                         </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/classes</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/src/main/resources</directory>
-                                    <filtering>true</filtering>
-                                    <includes>
-                                        <include>version.properties</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
+                        <phase>process-classes</phase>
                     </execution>
                 </executions>
+                <configuration>
+                    <scannedDependencies>
+                        <dependency>
+                            <groupId>com.atlassian.plugin</groupId>
+                            <artifactId>atlassian-spring-scanner-external-jar</artifactId>
+                        </dependency>
+                    </scannedDependencies>
+                    <verbose>false</verbose>
+                </configuration>
             </plugin>
         </plugins>
     </build>

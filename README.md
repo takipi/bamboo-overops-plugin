@@ -68,9 +68,11 @@ Prints the top X events (as provided by this parameter) with the highest volume 
 
 If checked the build will be marked ***failed*** if any quality gate did not pass.
 
-### Quality Gate Settings
+#### Show All Events
 
-<!--  continue from here  -->
+If checked the quality report will list events for both passed and failed quality gates, otherwise only events for failed gates will be displayed.
+
+### Quality Gate Settings
 
 #### New Error Gate
 
@@ -94,41 +96,9 @@ A comma delimited list of exception types that are deemed as critical.
 
 **Example:** `NullPointerException,IndexOutOfBoundsException`
 
-#### Increasing Errors Gate
+#### Do not fail the build if OverOps reliability report fails to run
 
-Detect increasing error counts in your current build versus a given baseline.
-
-##### Active Time Window
-
-The time window inspected to search for increasing errors. Set to zero to use the Deployment Name. Supported values are: **d** - day, **h** - hour, **m** - minute.
-
-**Example:** `12h`
-
-##### Baseline Time Window
-
-The time window against which events in the active window are compared to test for increasing errors. Supported values are: **d** - day, **h** - hour, **m** - minute.
-
-**Example:** `7d`
-
-##### Error Volume Threshold
-
-The minimum number of times an event must take place to fail the quality gate.
-
-##### Error Rate Threshold (0-1)
-
-The minimum rate at which event must take place to fail the quality gate. A rate of 0.1 means the events is allowed to take place <= 10% of the time.
-
-##### Regression Delta (0-1)
-
-The change in percentage between an event's rate in the active time window compared to the baseline to be considered a increasing error. A rate of 0.1 means the events is allowed to take place <= 10% of the time.
-
-##### Critical Regression Threshold (0-1)
-
-The change in percentage between an event's rate in the active time window compared to the baseline to be considered a critical increasing error. A rate of 0.1 means the events is allowed to take place <= 10% of the time.
-
-##### Apply Seasonality
-
-If peaks have been seen in baseline window, then this would be considered normal and not an increasing error. Should OverOps identify an equal or matching peak in the baseline time window, or two peaks of greater than 50% of the volume seen in the active time window, the event will not be marked as an increasing error.
+If checked, inability to run the OverOps reliability report will not fail the build.
 
 #### Debug
 

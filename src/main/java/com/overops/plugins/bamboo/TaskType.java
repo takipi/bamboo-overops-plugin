@@ -3,15 +3,13 @@ package com.overops.plugins.bamboo;
 import java.io.PrintWriter;
 import java.io.PrintStream;
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
 
 
+import com.overops.report.service.model.HtmlParts;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.configuration.ConfigurationMap;
-import com.atlassian.bamboo.process.ProcessService;
 import com.atlassian.bamboo.task.TaskContext;
 import com.atlassian.bamboo.task.TaskException;
 import com.atlassian.bamboo.task.TaskResult;
@@ -24,7 +22,6 @@ import com.overops.plugins.bamboo.configuration.Const;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.overops.plugins.bamboo.configuration.Const;
 import com.overops.plugins.bamboo.service.impl.BambooPrintWriter;
 import com.overops.report.service.QualityReportParams;
 import com.overops.report.service.ReportService;
@@ -70,27 +67,43 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
 
         TaskResultBuilder resultBuilder = TaskResultBuilder.newBuilder(context);
 
+        logger.addBuildLogEntry(context.getConfigurationMap().get(Const.LINK));
+        Boolean displayLink = Boolean.parseBoolean(context.getConfigurationMap().get(Const.LINK));
         try {
-            logger.addBuildLogEntry("[" + Utils.getArtifactId() + " v" + Utils.getVersion() + "]");
+            if (displayLink)
+            {
+                String appUrl = (String)globalSettings.get(Const.GLOBAL_APP_URL);
+                HtmlParts htmlParts = new HtmlParts(overOpsService.generateReportLinkHtml(appUrl, query), "");
+                context.getBuildContext().getBuildResult().getCustomBuildData().put("overOpsReport", objectMapper.writeValueAsString(htmlParts));
+                context.getBuildContext().getBuildResult().getCustomBuildData().put("isOverOpsStep", "true");
+                return resultBuilder.success().build();
+            } else
+            {
+                logger.addBuildLogEntry("[" + Utils.getArtifactId() + " v" + Utils.getVersion() + "]");
 
-            boolean showAllEvents = Boolean.parseBoolean(context.getConfigurationMap().get(Const.SHOW_ALL_EVENTS));
-            boolean isDebug = Boolean.parseBoolean(context.getConfigurationMap().get(Const.DEBUG));
-            PrintStream printStream = isDebug ? new BambooPrintWriter(System.out, logger) : null;
+                boolean showAllEvents = Boolean.parseBoolean(context.getConfigurationMap().get(Const.SHOW_ALL_EVENTS));
+                boolean isDebug = Boolean.parseBoolean(context.getConfigurationMap().get(Const.DEBUG));
+                PrintStream printStream = isDebug ? new BambooPrintWriter(System.out, logger) : null;
 
-            QualityReport reportModel = overOpsService.runQualityReport(endPoint, apiKey, query, Requestor.BAMBOO, printStream, isDebug);
+                ReportService.pauseForTheCause();
+                QualityReport reportModel = overOpsService.runQualityReport(endPoint, apiKey, query, Requestor.BAMBOO, printStream, isDebug);
 
-            context.getBuildContext().getBuildResult().getCustomBuildData().put("overOpsReport", objectMapper.writeValueAsString(reportModel.getHtmlParts(showAllEvents)));
-            context.getBuildContext().getBuildResult().getCustomBuildData().put("isOverOpsStep", "true");
+                context.getBuildContext().getBuildResult().getCustomBuildData().put("overOpsReport", objectMapper.writeValueAsString(reportModel.getHtmlParts(showAllEvents)));
+                context.getBuildContext().getBuildResult().getCustomBuildData().put("isOverOpsStep", "true");
 
-            if (reportModel.getStatusCode() == ReportStatus.FAILED) {
-                if ((reportModel.getExceptionDetails() != null) && Boolean.parseBoolean(context.getConfigurationMap().get(Const.PASS_BUILD_ON_QR_EXCEPTION))) {
+                if (reportModel.getStatusCode() == ReportStatus.FAILED)
+                {
+                    if ((reportModel.getExceptionDetails() != null) && Boolean.parseBoolean(context.getConfigurationMap().get(Const.PASS_BUILD_ON_QR_EXCEPTION)))
+                    {
+                        return resultBuilder.success().build();
+                    }
+                    return resultBuilder.failed().build();
+                }
+                else
+                {
                     return resultBuilder.success().build();
                 }
-                return resultBuilder.failed().build();
-            } else {
-                return resultBuilder.success().build();
             }
-
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);

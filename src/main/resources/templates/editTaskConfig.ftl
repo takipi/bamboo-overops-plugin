@@ -51,6 +51,7 @@
 [@ww.textfield labelKey="com.overops.plugins.bamboo.task.config.topErrorCount" name="topErrorCount" required="false" description="The number of total and unique errors to show in the quality report, sorted by volume." /]
 <hr class="divider"/>
 [@ww.checkbox labelKey="com.overops.plugins.bamboo.task.config.markUnstable" name="markUnstable" required="false" description="If checked the build will be marked unstable when any quality gates fail."/]
+[@ww.checkbox labelKey="com.overops.plugins.bamboo.task.config.link" name="link" required="false" description="If checked a link will be generated and displayed. The Quality Report can then be viewed by click the generated link. Note: If checked the Mark Unstable option is ignored."/]
 <hr class="divider"/>
 [@ww.checkbox labelKey="com.overops.plugins.bamboo.task.config.showAllEvents" name="showAllEvents" required="false" description="If checked the quality report will list events for both passed and failed quality gates, otherwise only events for failed gates will be displayed."/]
 

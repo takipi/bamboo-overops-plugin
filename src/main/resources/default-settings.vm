@@ -16,6 +16,13 @@
           </div>
         </div>
         <div class="field-group">
+          <label for="name">APP URL</label>
+          <input type="text" id="appUrl" name="appUrl" class="text" value="${appUrl}">
+          <div class="description">
+            The complete url including protocol and port of the OverOps APP (e.g. https://app.overops.com or http://host.domain.com:8080)
+          </div>
+        </div>
+        <div class="field-group">
           <label for="name">API Token</label>
           <input type="password" id="apiToken" name="apiToken" class="text" value="${apiToken}">
           <div class="description">

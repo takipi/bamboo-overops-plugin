@@ -3,6 +3,7 @@ package com.overops.plugins.bamboo;
 import java.io.PrintWriter;
 import java.io.PrintStream;
 import java.io.StringWriter;
+import java.util.Properties;
 
 
 import com.overops.report.service.model.HtmlParts;
@@ -67,24 +68,34 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
 
         TaskResultBuilder resultBuilder = TaskResultBuilder.newBuilder(context);
 
-        logger.addBuildLogEntry(context.getConfigurationMap().get(Const.LINK));
-        Boolean displayLink = Boolean.parseBoolean(context.getConfigurationMap().get(Const.LINK));
         try {
+            logger.addBuildLogEntry("[" + Utils.getArtifactId() + " v" + Utils.getVersion() + "]");
+
+            boolean isDebug = Boolean.parseBoolean(context.getConfigurationMap().get(Const.DEBUG));
+            String appUrl = (String)globalSettings.get(Const.GLOBAL_APP_URL);
+
+            Properties props = Utils.getOverOpsProperties();
+            PrintStream printStream = null;
+            if (isDebug)
+            {
+                printStream = new BambooPrintWriter(System.out, logger);
+                logger.addBuildLogEntry(props.get("com.overops.plugins.bamboo.task.config.apiUrl") + ": " + endPoint);
+                logger.addBuildLogEntry(props.get("com.overops.plugins.bamboo.task.config.appUrl") + ": " + appUrl);
+                logger.addBuildLogEntry(props.get("com.overops.plugins.bamboo.task.config.envId") + ": " + query.getServiceId());
+                logger.addBuildLogEntry(props.get("com.overops.plugins.bamboo.task.config.applicationName") + ": " + query.getApplicationName());
+                logger.addBuildLogEntry(props.get("com.overops.plugins.bamboo.task.config.deploymentName") + ": " + query.getDeploymentName());
+            }
+
+            Boolean displayLink = Boolean.parseBoolean(context.getConfigurationMap().get(Const.LINK));
             if (displayLink)
             {
-                String appUrl = (String)globalSettings.get(Const.GLOBAL_APP_URL);
                 HtmlParts htmlParts = new HtmlParts(overOpsService.generateReportLinkHtml(appUrl, query), "");
                 context.getBuildContext().getBuildResult().getCustomBuildData().put("overOpsReport", objectMapper.writeValueAsString(htmlParts));
                 context.getBuildContext().getBuildResult().getCustomBuildData().put("isOverOpsStep", "true");
                 return resultBuilder.success().build();
             } else
             {
-                logger.addBuildLogEntry("[" + Utils.getArtifactId() + " v" + Utils.getVersion() + "]");
-
                 boolean showAllEvents = Boolean.parseBoolean(context.getConfigurationMap().get(Const.SHOW_ALL_EVENTS));
-                boolean isDebug = Boolean.parseBoolean(context.getConfigurationMap().get(Const.DEBUG));
-                PrintStream printStream = isDebug ? new BambooPrintWriter(System.out, logger) : null;
-
                 ReportService.pauseForTheCause();
                 QualityReport reportModel = overOpsService.runQualityReport(endPoint, apiKey, query, Requestor.BAMBOO, printStream, isDebug);
 
@@ -120,6 +131,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
     private QualityReportParams getQualityReportParams(ConfigurationMap params) {
         QualityReportParams qrp = new QualityReportParams();
 
+
         qrp.setServiceId((String)params.get(Const.ENV_ID));
         qrp.setApplicationName(params.get(Const.APP_NAME));
         qrp.setDeploymentName(params.get(Const.DEP_NAME));
@@ -127,6 +139,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         qrp.setRegexFilter(params.get(Const.REGEX_FILTER));
         qrp.setMarkUnstable(Boolean.parseBoolean(params.get(Const.MARK_UNSTABLE)));
         qrp.setPrintTopIssues(NumberUtils.toInt(params.get(Const.TOP_ERROR_COUNT), 0));
+        qrp.setShowEventsForPassedGates(Boolean.parseBoolean(params.get(Const.SHOW_ALL_EVENTS)));
 
         qrp.setNewEvents(Boolean.parseBoolean(params.get(Const.CHECK_NEW_ERRORS)));
         qrp.setResurfacedErrors(Boolean.parseBoolean(params.get(Const.CHECK_RESURFACED_ERRORS)));

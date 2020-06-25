@@ -34,6 +34,7 @@ public class AdminServlet extends HttpServlet {
         template("default-settings.vm"),
         envId("envId"),
         apiUrl("apiUrl"),
+        appUrl("appUrl"),
         apiToken("apiToken"),
         save("save"),
         testConnection("testConnection"),
@@ -77,6 +78,10 @@ public class AdminServlet extends HttpServlet {
         String globalApiUrl = (String) pluginSettings.get(Const.GLOBAL_API_URL);
         String url = StringUtils.isBlank(globalApiUrl) ? Const.DEFAULT_API_URL : globalApiUrl;
 
+        // APP URL: if blank, set default value
+        String globalAppUrl = (String) pluginSettings.get(Const.GLOBAL_APP_URL);
+        String appUrl = StringUtils.isBlank(globalAppUrl) ? Const.DEFAULT_APP_URL : globalAppUrl;
+
         // ENV, TOKEN: blank is default value (replace null, whitespace with blank)
         String globalEnvId = (String) pluginSettings.get(Const.GLOBAL_ENV_ID);
         String env = StringUtils.isBlank(globalEnvId) ? "" : globalEnvId;
@@ -86,6 +91,7 @@ public class AdminServlet extends HttpServlet {
 
         // set velocity context
         context.put(VM.apiUrl.get(), url);
+        context.put(VM.appUrl.get(), appUrl);
         context.put(VM.envId.get(), env);
         context.put(VM.apiToken.get(), token);
 
@@ -103,6 +109,7 @@ public class AdminServlet extends HttpServlet {
         // populate values from form
         String env = req.getParameter(VM.envId.get()).trim().toUpperCase();
         String url = req.getParameter(VM.apiUrl.get()).trim();
+        String appUrl = req.getParameter(VM.appUrl.get()).trim();
         String token = req.getParameter(VM.apiToken.get()).trim();
 
         // check if 'save' or 'test connection' was submitted
@@ -115,6 +122,7 @@ public class AdminServlet extends HttpServlet {
             PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
             pluginSettings.put(Const.GLOBAL_ENV_ID, env);
             pluginSettings.put(Const.GLOBAL_API_URL, url);
+            pluginSettings.put(Const.GLOBAL_APP_URL, appUrl);
             pluginSettings.put(Const.GLOBAL_API_TOKEN, token);
 
             context.put(VM.isSuccess.get(), "true");
@@ -161,6 +169,7 @@ public class AdminServlet extends HttpServlet {
 
         // set velocity context
         context.put(VM.apiUrl.get(), url);
+        context.put(VM.appUrl.get(), appUrl);
         context.put(VM.envId.get(), env);
         context.put(VM.apiToken.get(), token);
 

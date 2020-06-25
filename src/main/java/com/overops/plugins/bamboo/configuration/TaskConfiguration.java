@@ -26,6 +26,7 @@ public class TaskConfiguration extends AbstractTaskConfigurator implements Build
         // set minimal defaults
         context.put(Const.TOP_ERROR_COUNT, Const.DEFAULT_TOP_ERROR_COUNT);
         context.put(Const.MARK_UNSTABLE, Const.DEFAULT_MARK_UNSTABLE);
+        context.put(Const.LINK, Const.DEFAULT_LINK);
     }
 
     /**
@@ -44,6 +45,7 @@ public class TaskConfiguration extends AbstractTaskConfigurator implements Build
         context.put(Const.REGEX_FILTER, config.get(Const.REGEX_FILTER));
         context.put(Const.TOP_ERROR_COUNT, config.get(Const.TOP_ERROR_COUNT));
         context.put(Const.MARK_UNSTABLE, config.get(Const.MARK_UNSTABLE));
+        context.put(Const.LINK, config.get(Const.LINK));
         context.put(Const.SHOW_ALL_EVENTS, config.get(Const.SHOW_ALL_EVENTS));
         context.put(Const.PASS_BUILD_ON_QR_EXCEPTION, config.get(Const.PASS_BUILD_ON_QR_EXCEPTION));
 
@@ -82,6 +84,7 @@ public class TaskConfiguration extends AbstractTaskConfigurator implements Build
         config.put(Const.REGEX_FILTER, params.getString(Const.REGEX_FILTER));
         config.put(Const.TOP_ERROR_COUNT, params.getString(Const.TOP_ERROR_COUNT));
         config.put(Const.MARK_UNSTABLE, params.getString(Const.MARK_UNSTABLE));
+        config.put(Const.LINK, params.getString(Const.LINK));
         config.put(Const.SHOW_ALL_EVENTS, params.getString(Const.SHOW_ALL_EVENTS));
         config.put(Const.PASS_BUILD_ON_QR_EXCEPTION, params.getString(Const.PASS_BUILD_ON_QR_EXCEPTION));
 

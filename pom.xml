@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.overops.plugins</groupId>
     <artifactId>overops-bamboo-app</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 
     <organization>
         <name>OverOps</name>
@@ -36,7 +36,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <!-- api-client local dev build with https://github.com/takipi/api-client/pull/147 -->
-        <takipi.version>2.33.0</takipi.version>
+        <takipi.version>2.34.0</takipi.version>
     </properties>
 
     <dependencies>
@@ -104,6 +104,12 @@
             <groupId>com.takipi</groupId>
             <artifactId>report-service</artifactId>
             <version>${takipi.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
 
@@ -152,6 +158,7 @@
                         <!-- Add package to export here -->
                         <Export-Package>
                             com.overops.plugins,
+                            org.apache.avalon.framework.logger
                         </Export-Package>
 
                         <!-- Add package import here -->

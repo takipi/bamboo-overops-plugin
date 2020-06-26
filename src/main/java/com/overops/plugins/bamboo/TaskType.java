@@ -74,22 +74,12 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             boolean isDebug = Boolean.parseBoolean(context.getConfigurationMap().get(Const.DEBUG));
             String appUrl = (String)globalSettings.get(Const.GLOBAL_APP_URL);
 
-            Properties props = Utils.getOverOpsProperties();
-            PrintStream printStream = null;
-            if (isDebug)
-            {
-                printStream = new BambooPrintWriter(System.out, logger);
-                logger.addBuildLogEntry(props.get("com.overops.plugins.bamboo.task.config.apiUrl") + ": " + endPoint);
-                logger.addBuildLogEntry(props.get("com.overops.plugins.bamboo.task.config.appUrl") + ": " + appUrl);
-                logger.addBuildLogEntry(props.get("com.overops.plugins.bamboo.task.config.envId") + ": " + query.getServiceId());
-                logger.addBuildLogEntry(props.get("com.overops.plugins.bamboo.task.config.applicationName") + ": " + query.getApplicationName());
-                logger.addBuildLogEntry(props.get("com.overops.plugins.bamboo.task.config.deploymentName") + ": " + query.getDeploymentName());
-            }
+            PrintStream printStream = isDebug ? new BambooPrintWriter(System.out, logger) : null;
 
             Boolean displayLink = Boolean.parseBoolean(context.getConfigurationMap().get(Const.LINK));
             if (displayLink)
             {
-                HtmlParts htmlParts = new HtmlParts(overOpsService.generateReportLinkHtml(appUrl, query), "");
+                HtmlParts htmlParts = new HtmlParts(overOpsService.generateReportLinkHtml(appUrl, query, printStream, isDebug), "");
                 context.getBuildContext().getBuildResult().getCustomBuildData().put("overOpsReport", objectMapper.writeValueAsString(htmlParts));
                 context.getBuildContext().getBuildResult().getCustomBuildData().put("isOverOpsStep", "true");
                 return resultBuilder.success().build();

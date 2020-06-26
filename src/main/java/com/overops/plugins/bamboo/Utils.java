@@ -18,13 +18,6 @@ public class Utils {
         return getProperty("artifactId");
     }
 
-    public static Properties getOverOpsProperties() throws IOException
-    {
-        Properties props = new Properties();
-        props.load(Utils.class.getResourceAsStream("overops.properties"));
-        return props;
-    }
-
     private static String getProperty(String prop) throws IOException {
         Properties props = new Properties();
         props.load(Utils.class.getResourceAsStream("/version.properties"));

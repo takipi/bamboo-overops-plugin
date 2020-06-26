@@ -74,7 +74,7 @@ If checked the build will be marked ***failed*** if any quality gate did not pas
 
 #### Create a Report Link
 
-If checked a link will be generated and displayed. The Quality Report can then be viewed by click the generated link. Note: If checked the Mark Unstable option is ignored.
+If checked a link will be generated and displayed. The Quality Report can then be viewed by clicking the generated link. Note: If checked the Mark Unstable option is ignored.
 
 #### Show All Events
 

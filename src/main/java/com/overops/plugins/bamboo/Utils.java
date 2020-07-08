@@ -1,5 +1,7 @@
 package com.overops.plugins.bamboo;
 
+import org.springframework.core.io.support.PropertiesLoaderUtils;
+
 import java.io.*;
 import java.util.*;
 

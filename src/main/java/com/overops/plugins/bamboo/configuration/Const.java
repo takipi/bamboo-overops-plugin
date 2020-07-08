@@ -11,6 +11,7 @@ public class Const {
     // PluginSettingsFactory global settings
     public static final String GLOBAL_ENV_ID = "com.overops.plugins.bamboo:global-api-env-id";
     public static final String GLOBAL_API_URL = "com.overops.plugins.bamboo:global-api-url";
+    public static final String GLOBAL_APP_URL = "com.overops.plugins.bamboo:global-app-url";
     public static final String GLOBAL_API_TOKEN = "com.overops.plugins.bamboo:global-api-token";
 
 
@@ -21,6 +22,7 @@ public class Const {
     public static final String REGEX_FILTER = "regexFilter";
     public static final String TOP_ERROR_COUNT = "topErrorCount";
     public static final String MARK_UNSTABLE = "markUnstable";
+    public static final String LINK = "link";
     public static final String SHOW_ALL_EVENTS = "showAllEvents";
     public static final String PASS_BUILD_ON_QR_EXCEPTION = "passOnQRException";
 
@@ -41,7 +43,9 @@ public class Const {
 
     // default values
     public static final String DEFAULT_API_URL = "https://api.overops.com/";
+    public static final String DEFAULT_APP_URL = "https://app.overops.com/";
 
     public static final String DEFAULT_TOP_ERROR_COUNT = "10";
     public static final String DEFAULT_MARK_UNSTABLE = "true";
+    public static final String DEFAULT_LINK = "false";
 }

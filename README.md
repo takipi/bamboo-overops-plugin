@@ -22,6 +22,10 @@ From Bamboo Administration, select "Settings" under "OverOps". Enter the API URL
 
 The complete URL of the OverOps API, including port. For example, https://api.overops.com for SaaS or http://host.domain.com:8080 for on prem.
 
+### APP URL
+
+The complete URL of the OverOps APP, including port. For example, https://app.overops.com for SaaS or http://host.domain.com:8080 for on prem.
+
 ### API Token
 
 The OverOps REST API token to use for authentication. [This can be obtained from the OverOps dashboard under Settings &rarr; Account](https://doc.overops.com/docs/api-token).
@@ -67,6 +71,10 @@ Prints the top X events (as provided by this parameter) with the highest volume 
 #### Mark Build Unstable
 
 If checked the build will be marked ***failed*** if any quality gate did not pass.
+
+#### Create a Report Link
+
+If checked a link will be generated and displayed. The Quality Report can then be viewed by clicking the generated link. Note: If checked the Mark Unstable option is ignored.
 
 #### Show All Events
 
